@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
-<title>ImageFlow 0.6</title>
+<title>ImageFlow 0.7</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
 <meta name="language" content="de" />
 <meta name="description" content="ImageFlow ist eine Bildergallerie in Javascript, angelehnt an Apples CoverFlow."/>
@@ -15,25 +15,35 @@
 <body>
 <div id="changelog">
 	<div>
-		<b>Download:</b> <a href="ImageFlow_0.6.rar">ImageFlow_0.6.rar</a> [22 KB]<br/>
+		<b>Download:</b> <a href="ImageFlow_0.7.rar">ImageFlow_0.7.rar</a> [22 KB]<br/>
 		<br/>
-		You are free to use this in any product, or on any web site. For more information about ImageFlow read the <a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=5&s_id=21">Documentation</a> and check my <a target="_top" href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog</a>. For anything else simply drop me a line in my <a href="http://shoutbox.finnrudolph.de/">Shoutbox</a>.<br/><br/>
+		You are free to use this in any product, or on any web site. For more information about ImageFlow read the <a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=5&amp;s_id=21">Documentation</a> and check my <a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog</a>. For anything else simply drop me a line in my <a href="http://shoutbox.finnrudolph.de/">Shoutbox</a>.<br/><br/>
 		<br/>
 		<b>ChangeLog</b><br/>
 		<br/>
+		Version 0.7
+		<ul>
+			<li>Added different cursor types<br/></li>
+			<li>Added configuration variables<br/></li>
+			<li>Changed implementation: <i>all</i> JavaScript is now stored inside the imageflow.js<br/></li>
+			<li>Changed the captions handling: now the caption text is directly stored in the alt attribute of the image tag<br/></li>
+			<li>Fixed a bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&amp;s_id=15&amp;ShowEntry=1196180083">description</a>)<br/></li>
+		</ul>
+		
+		<p id="lnk" style="display:inline;"><a style="text-decoration:underline;cursor:pointer;" onclick="document.getElementById('log').style.display='block'; document.getElementById('lnk').style.display='none';refresh();" >Show full ChangeLog</a><br/><br/><br/></p>
+	</div>
+	<div style="text-align:left;display:none;padding-top:10px;" id="log">
 		Version 0.6
 		<ul>
 			<li>Added arrow key support<br/></li>
 			<li>Improved usability: now it just interacts on mouse wheel events if the cursor is <i>over</i> the main div container "imageflow"<br/></li>
 			<li>Improved div container positioning<br/></li>
-			<li>Fixed a bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&s_id=15&ShowEntry=1196111855">description</a>)<br/></li>
+			<li>Fixed a bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&amp;s_id=15&amp;ShowEntry=1196111855">description</a>)<br/></li>
 		</ul>
-		<p id="lnk" style="display:inline;"><a style="text-decoration:underline;" onclick="document.getElementById('log').style.display='block'; document.getElementById('lnk').style.display='none';refresh();" >Show full ChangeLog</a><br/><br/><br/></p>
-	</div>
-	<div style="text-align:left;display:none;padding-top:10px;" id="log">
+		<br/>
 		Version 0.5.1
 		<ul>
-			<li>Fixed a mouse wheel bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&s_id=15&ShowEntry=1195662384">description</a>)<br/></li>
+			<li>Fixed a mouse wheel bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&amp;s_id=15&amp;ShowEntry=1195662384">description</a>)<br/></li>
 		</ul>
 		<br/>
 		Version 0.5
@@ -90,123 +100,51 @@
 	</form>
 	<br/><br/>
 	<div>
-		Open your free <a href="https://www.moneybookers.com/app/?rid=4434964">moneybookers.com</a> account with your email address. Upload funds to your account via bank transfer, credit/debit card or cheque. And send the amount of your choice to my email account: finn.rudolph@googlemail.com<br/>
+		Open your free <a href="https://www.moneybookers.com/app/?rid=4434964">moneybookers.com</a> account with your email address. Upload funds to your account via bank transfer, credit/debit card or cheque. And send the amount of your choice to my account: finn.rudolph@googlemail.com<br/>
 	</div>
 </div>
 
-<h1>ImageFlow 0.6</h1><br/>
+<h1>ImageFlow 0.7</h1><br/>
 <div id="imageflow">
 	<div id="loading">
 		<b>Loading images</b><br/>
-		<img src="loading.gif" width="208" height="13" alt="" />
+		<img src="loading.gif" width="208" height="13" alt="loading" />
 	</div>
 	<div id="images">
-		<img onclick="glideTo(0,'i1' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-150,'i2' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-300,'i3' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-450,'i4' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-600,'i5' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-750,'i6' )" src="reflect.php?img=img/img006.jpg" alt="" />
-		<img onclick="glideTo(-900,'i7' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-1050,'i8' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-1200,'i9' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-1350,'i10' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-1500,'i11' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-1650,'i12' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-1800,'i13' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-1950,'i14' )" src="reflect.php?img=img/img006.jpg" alt="" />
-		<img onclick="glideTo(-2100,'i15' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-2250,'i16' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-2400,'i17' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-2550,'i18' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-2700,'i19' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-2850,'i20' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-3000,'i21' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-3150,'i22' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-3300,'i23' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-3450,'i24' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-3600,'i25' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-3750,'i26' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-3900,'i27' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-4050,'i28' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-4200,'i29' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-4350,'i30' )" src="reflect.php?img=img/img006.jpg" alt="" />
-		<img onclick="glideTo(-4500,'i31' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-4650,'i32' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-4800,'i33' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-4950,'i34' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-5100,'i35' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-5250,'i36' )" src="reflect.php?img=img/img006.jpg" alt="" />
-		<img onclick="glideTo(-5400,'i37' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-5550,'i38' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-5700,'i39' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-5850,'i40' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-6000,'i41' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-6150,'i42' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-6300,'i43' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-6450,'i44' )" src="reflect.php?img=img/img002.jpg" alt="" />
-		<img onclick="glideTo(-6600,'i45' )" src="reflect.php?img=img/img003.jpg" alt="" />
-		<img onclick="glideTo(-6750,'i46' )" src="reflect.php?img=img/img004.jpg" alt="" />
-		<img onclick="glideTo(-6900,'i47' )" src="reflect.php?img=img/img005.jpg" alt="" />
-		<img onclick="glideTo(-7050,'i48' )" src="reflect.php?img=img/img006.jpg" alt="" />
-		<img onclick="glideTo(-7200,'i49' )" src="reflect.php?img=img/img001.jpg" alt="" />
-		<img onclick="glideTo(-7350,'i50' )" src="reflect.php?img=img/img002.jpg" alt="" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 1" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 2" />
+		<img src="reflect.php?img=img/img002.jpg" alt="Image 3" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 4" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 5" />
+		<img src="reflect.php?img=img/img006.jpg" alt="Image 6" />
+		<img src="reflect.php?img=img/img004.jpg" alt="Image 7" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 8" />
+		<img src="reflect.php?img=img/img001.jpg" alt="Image 9" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 10" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 11" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 12" />
+		<img src="reflect.php?img=img/img004.jpg" alt="Image 13" />
+		<img src="reflect.php?img=img/img006.jpg" alt="Image 14" />
+		<img src="reflect.php?img=img/img002.jpg" alt="Image 15" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 16" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 17" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 18" />
+		<img src="reflect.php?img=img/img002.jpg" alt="Image 19" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 20" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 21" />
+		<img src="reflect.php?img=img/img006.jpg" alt="Image 22" />
+		<img src="reflect.php?img=img/img004.jpg" alt="Image 23" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 24" />
+		<img src="reflect.php?img=img/img001.jpg" alt="Image 25" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 26" />
+		<img src="reflect.php?img=img/img003.jpg" alt="Image 27" />
+		<img src="reflect.php?img=img/img005.jpg" alt="Image 28" />
+		<img src="reflect.php?img=img/img004.jpg" alt="Image 29" />
+		<img src="reflect.php?img=img/img006.jpg" alt="Image 30" />
 	</div>
 	<div id="captions"></div>
 	<div id="scrollbar">
-		<div onmousedown="dragstart(this)" id="scrollbar_slider"></div>
-	</div>
-	<div class="none">
-		<div id="i1"><b>Image 1</b></div>
-		<div id="i2"><b>Image 2</b></div>
-		<div id="i3"><b>Image 3</b></div>
-		<div id="i4"><b>Image 4</b></div>
-		<div id="i5"><b>Image 5</b></div>
-		<div id="i6"><b>Image 6</b></div>
-		<div id="i7"><b>Image 7</b></div>
-		<div id="i8"><b>Image 8</b></div>
-		<div id="i9"><b>Image 9</b></div>
-		<div id="i10"><b>Image 10</b></div>
-		<div id="i11"><b>Image 11</b></div>
-		<div id="i12"><b>Image 12</b></div>
-		<div id="i13"><b>Image 13</b></div>
-		<div id="i14"><b>Image 14</b></div>
-		<div id="i15"><b>Image 15</b></div>
-		<div id="i16"><b>Image 16</b></div>
-		<div id="i17"><b>Image 17</b></div>
-		<div id="i18"><b>Image 18</b></div>
-		<div id="i19"><b>Image 19</b></div>
-		<div id="i20"><b>Image 20</b></div>
-		<div id="i21"><b>Image 21</b></div>
-		<div id="i22"><b>Image 22</b></div>
-		<div id="i23"><b>Image 23</b></div>
-		<div id="i24"><b>Image 24</b></div>
-		<div id="i25"><b>Image 25</b></div>
-		<div id="i26"><b>Image 26</b></div>
-		<div id="i27"><b>Image 27</b></div>
-		<div id="i28"><b>Image 28</b></div>
-		<div id="i29"><b>Image 29</b></div>
-		<div id="i30"><b>Image 30</b></div>
-		<div id="i31"><b>Image 31</b></div>
-		<div id="i32"><b>Image 32</b></div>
-		<div id="i33"><b>Image 33</b></div>
-		<div id="i34"><b>Image 34</b></div>
-		<div id="i35"><b>Image 35</b></div>
-		<div id="i36"><b>Image 36</b></div>
-		<div id="i37"><b>Image 37</b></div>
-		<div id="i38"><b>Image 38</b></div>
-		<div id="i39"><b>Image 39</b></div>
-		<div id="i40"><b>Image 40</b></div>
-		<div id="i41"><b>Image 41</b></div>
-		<div id="i42"><b>Image 42</b></div>
-		<div id="i43"><b>Image 43</b></div>
-		<div id="i44"><b>Image 44</b></div>
-		<div id="i45"><b>Image 45</b></div>
-		<div id="i46"><b>Image 46</b></div>
-		<div id="i47"><b>Image 47</b></div>
-		<div id="i48"><b>Image 48</b></div>
-		<div id="i49"><b>Image 49</b></div>
-		<div id="i50"><b>Image 50</b></div>
+		<div id="slider"></div>
 	</div>
 </div>
 
