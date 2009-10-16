@@ -1,5 +1,5 @@
 /**
- *	ImageFlow 0.5
+ *	ImageFlow 0.5.1
  *
  *	This code is based on Michael L. Perrys Cover flow in Javascript.
  *	For he wrote that "You can take this code and use it as your own" [1]
@@ -235,6 +235,8 @@ window.onresize = refresh;
 /* Handle the wheel angle change (delta) of the mouse wheel */
 function handle(delta) 
 {
+	var change=false;
+
 	/* Extract the integer from the caption_id */
 	var caption_id_int = caption_id.substr(1);
 	caption_id_int = parseInt(caption_id_int);
@@ -242,10 +244,11 @@ function handle(delta)
 	switch (delta > 0) 
 	{
 		case true:
-			if(caption_id_int != 1)
+			if(caption_id_int != 1 && target <= 0)
 			{
 				target = target + 150;
 				new_caption_id = 'i' + (caption_id_int - 1);
+				change=true;
 			}
 			break;
 
@@ -254,12 +257,17 @@ function handle(delta)
 			{
 				target = target - 150;
 				new_caption_id = 'i' + (caption_id_int + 1);
+				change=true;
 			}
 			break;
 	}
 
 	/* Glide to next (mouse wheel down) / previous (mouse wheel up) image */
-	glideTo(target, new_caption_id);
+	if (change==true)
+	{
+		glideTo(target, new_caption_id);
+	}
+	
 }
 
 /* Event handler for mouse wheel event */
