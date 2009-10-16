@@ -1,5 +1,5 @@
 /**
- *	ImageFlow 0.8
+ *	ImageFlow 0.9
  *
  *	This code is based on Michael L. Perrys Cover flow in Javascript.
  *	For he wrote that "You can take this code and use it as your own" [1]
@@ -137,9 +137,12 @@ function moveTo(x)
 
 			/* Set new image properties */
 			image.style.left = xs - (image.pc / 2) / z * size + images_left + 'px';
-			image.style.height = new_img_h + 'px';
-			image.style.width = new_img_w + 'px';
-			image.style.top = new_img_top + 'px';
+			if(new_img_w && new_img_h)
+			{ 
+				image.style.height = new_img_h + 'px'; 
+				image.style.width = new_img_w + 'px'; 
+				image.style.top = new_img_top + 'px';
+			}
 			image.style.visibility = 'visible';
 
 			/* Set image layer through zIndex */
@@ -297,6 +300,13 @@ window.onresize = function()
 	if(document.getElementById(conf_imageflow)) refresh();
 }
 
+/* Fixes the back button issue */
+window.onunload = function()
+{
+  document = null;
+}
+
+
 /* Handle the wheel angle change (delta) of the mouse wheel */
 function handle(delta)
 {
@@ -387,7 +397,7 @@ function drag(e)
 		var new_target = (image_number) * -xstep;
 		var new_caption_id = image_number;
 
-		dragobject.style.left = new_posx + "px";
+		dragobject.style.left = new_posx + 'px';
 		glideTo(new_target, new_caption_id);
 	}
 }
@@ -397,6 +407,19 @@ function initMouseDrag()
 {
 	document.onmousemove = drag;
 	document.onmouseup = dragstop;
+
+	/* Avoid text and image selection while dragging  */
+	document.onselectstart = function () 
+	{
+		if (dragging == true)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 }
 
 function getKeyCode(event)
