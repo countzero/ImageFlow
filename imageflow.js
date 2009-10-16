@@ -1,6 +1,6 @@
 /*
 Name:       ImageFlow
-Version:    1.2 (August 9 2009)
+Version:    1.2.1 (August 10 2009)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -77,7 +77,7 @@ function ImageFlow ()
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		var optionsArray = new Array( 'aspectRatio', 'buttons', 'captions', 'imageCursor', 'imagesM', 'ImageFlowID', 'imageFocusM', 'imageFocusMax', 'imagesHeight', 'onClick', 'opacity', 'opacityArray', 'percentLandscape', 'percentOther', 'preloadImages', 'reflections', 'reflectionGET', 'reflectionP', 'reflectionPNG','imageScaling', 'scrollbarP', 'slider', 'sliderCursor', 'sliderWidth', 'startID', 'startAnimation', 'xStep' );
+		var optionsArray = ['aspectRatio', 'buttons', 'captions', 'imageCursor', 'imagesM', 'ImageFlowID', 'imageFocusM', 'imageFocusMax', 'imagesHeight', 'onClick', 'opacity', 'opacityArray', 'percentLandscape', 'percentOther', 'preloadImages', 'reflections', 'reflectionGET', 'reflectionP', 'reflectionPNG','imageScaling', 'scrollbarP', 'slider', 'sliderCursor', 'sliderWidth', 'startID', 'startAnimation', 'xStep'];
 		var max = optionsArray.length;
 		for (var i = 0; i < max; i++)
 		{
@@ -409,7 +409,7 @@ function ImageFlow ()
 		/* Override dynamic sizes based on the first image */
 		if(thisObject.imageScaling === false)
 		{
-			var image = thisObject.imagesDiv.childNodes[thisObject.indexArray[0]];
+			image = thisObject.imagesDiv.childNodes[thisObject.indexArray[0]];
 			
 			/* Set left padding for the first image */
 			this.totalImagesWidth = image.w * thisObject.max;
@@ -818,7 +818,8 @@ function ImageFlow ()
 			var state = false;
 			if(e.touches)
 			{
-				if(e.touches[0].target === thisObject.navigationDiv)
+				var target = e.touches[0].target;
+				if(target === thisObject.navigationDiv || target === thisObject.sliderDiv || target === thisObject.scrollbarDiv)
 				{
 					state = true;
 				}
