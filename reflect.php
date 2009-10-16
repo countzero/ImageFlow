@@ -20,6 +20,15 @@
         cache           optional    Save reflection image to the cache? (boolean)
 	*/
 	
+	// Replace special chars to be HTML-Code
+	function stringToHTML($string)
+	{
+		$array_search = array('é', 'è', 'ë', 'ê', 'à', 'ä', 'Ä', 'â', 'ù', 'ü', 'Ü', 'û', 'ö', 'Ö', 'ô', 'ï', 'î');
+		$array_replace = array('&eacute;', '&egrave;',	'&euml;', '&ecirc;', '&agrave;', '&auml;', '&Auml;', '&acirc;', '&ugrave;', '&uuml;', '&Uuml;', '&ucirc;', '&ouml;', '&Ouml;', '&ocirc;', '&iuml;', '&icirc;');
+		$string_return = str_replace($array_search, $array_replace, $string);
+		return $string_return;
+	}
+
 	// CACHE! EVERYTHING! 
 	$_GET['cache'] = 1;
 
@@ -60,6 +69,9 @@
 	if (isset($_GET['img']))
 	{
 		$source_image = $_GET['img'];
+
+		//$source_image = utf8_decode($source_image);
+
 		$source_image = str_replace('://','',$source_image);
 		//$source_image = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $source_image;
         
