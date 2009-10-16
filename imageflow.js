@@ -1,6 +1,6 @@
 /*
 Name:       ImageFlow
-Version:    1.1 (March 13 2008)
+Version:    1.2 (August 9 2009)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -40,11 +40,13 @@ function ImageFlow ()
 	this.defaults =
 	{
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
+		buttons:            false,          /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
 		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
+		imageScaling:       true,           /* Toggle image scaling */ 
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
 		imagesM:            1.0,            /* Multiplicator for all images in percent */
 		onClick:            function() { document.location = this.url; },   /* Onclick behaviour */
@@ -66,15 +68,16 @@ function ImageFlow ()
 		xStep:              150             /* Step width on the x-axis in px */
 	};
 
+	
 	/* Closure for this */
 	var thisObject = this;
 
-
+	
 	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		var optionsArray = new Array( 'aspectRatio', 'captions', 'imageCursor', 'imagesM', 'ImageFlowID', 'imageFocusM', 'imageFocusMax', 'imagesHeight', 'onClick', 'opacity', 'opacityArray', 'percentLandscape', 'percentOther', 'preloadImages', 'reflections', 'reflectionGET', 'reflectionP', 'reflectionPNG', 'scrollbarP', 'slider', 'sliderCursor', 'sliderWidth', 'startID', 'startAnimation', 'xStep' );
+		var optionsArray = new Array( 'aspectRatio', 'buttons', 'captions', 'imageCursor', 'imagesM', 'ImageFlowID', 'imageFocusM', 'imageFocusMax', 'imagesHeight', 'onClick', 'opacity', 'opacityArray', 'percentLandscape', 'percentOther', 'preloadImages', 'reflections', 'reflectionGET', 'reflectionP', 'reflectionPNG','imageScaling', 'scrollbarP', 'slider', 'sliderCursor', 'sliderWidth', 'startID', 'startAnimation', 'xStep' );
 		var max = optionsArray.length;
 		for (var i = 0; i < max; i++)
 		{
@@ -95,8 +98,11 @@ function ImageFlow ()
 			{
 				this.imagesDiv = document.getElementById(thisObject.ImageFlowID+'_images');
 				this.captionDiv = document.getElementById(thisObject.ImageFlowID+'_caption');
+				this.navigationDiv = document.getElementById(thisObject.ImageFlowID+'_navigation');
 				this.scrollbarDiv = document.getElementById(thisObject.ImageFlowID+'_scrollbar');
 				this.sliderDiv = document.getElementById(thisObject.ImageFlowID+'_slider');
+				this.buttonNextDiv = document.getElementById(thisObject.ImageFlowID+'_next');
+				this.buttonPreviousDiv = document.getElementById(thisObject.ImageFlowID+'_previous');
 
 				this.indexArray = [];
 				this.current = 0;
@@ -124,16 +130,12 @@ function ImageFlow ()
 			}
 		}
 	};
-
-
+	
 	/* Create HTML Structure */
 	this.createStructure = function()
 	{
 		/* Create images div container */
-		var imagesDiv = document.createElement('div');
-		imagesDiv.setAttribute('id',thisObject.ImageFlowID+'_images');
-		imagesDiv.setAttribute('class','images');
-		imagesDiv.setAttribute('className','images');
+		var imagesDiv = thisObject.Helper.createDocumentElement('div','images');
 
 		/* Shift all images into the images div */
 		var node = null;
@@ -162,48 +164,43 @@ function ImageFlow ()
 		}
 
 		/* Create loading text container */
-		var loadingP = document.createElement('p');
+		var loadingP = thisObject.Helper.createDocumentElement('p','loading_txt');
 		var loadingText = document.createTextNode(' ');
-		loadingP.setAttribute('id',thisObject.ImageFlowID+'_loading_txt');
 		loadingP.appendChild(loadingText);
 
 		/* Create loading div container */
-		var loadingDiv = document.createElement('div');
-		loadingDiv.setAttribute('id',thisObject.ImageFlowID+'_loading');
-		loadingDiv.setAttribute('class','loading');
-		loadingDiv.setAttribute('className','loading');
+		var loadingDiv = thisObject.Helper.createDocumentElement('div','loading');
 
 		/* Create loading bar div container inside the loading div */
-		var loadingBarDiv = document.createElement('div');
-		loadingBarDiv.setAttribute('id',thisObject.ImageFlowID+'_loading_bar');
-		loadingBarDiv.setAttribute('class','loading_bar');
-		loadingBarDiv.setAttribute('className','loading_bar');
+		var loadingBarDiv = thisObject.Helper.createDocumentElement('div','loading_bar');
 		loadingDiv.appendChild(loadingBarDiv);
 
-		/* Create captions div container */
-		var captionDiv = document.createElement('div');
-		captionDiv.setAttribute('id',thisObject.ImageFlowID+'_caption');
-		captionDiv.setAttribute('class','caption');
-		captionDiv.setAttribute('className','caption');
-
-		/* Create slider div container inside the scrollbar div */
-		var scrollbarDiv = document.createElement('div');
-		scrollbarDiv.setAttribute('id',thisObject.ImageFlowID+'_scrollbar');
-		scrollbarDiv.setAttribute('class','scrollbar');
-		scrollbarDiv.setAttribute('className','scrollbar');
-		var sliderDiv = document.createElement('div');
-		sliderDiv.setAttribute('id',thisObject.ImageFlowID+'_slider');
-		sliderDiv.setAttribute('class','slider');
-		sliderDiv.setAttribute('className','slider');
-		scrollbarDiv.appendChild(sliderDiv);
-
+		/* Create captions div container */		
+		var captionDiv = thisObject.Helper.createDocumentElement('div','caption');
+		
+		/* Create slider and button div container inside the scrollbar div */
+		var scrollbarDiv = thisObject.Helper.createDocumentElement('div','scrollbar');
+		var sliderDiv = thisObject.Helper.createDocumentElement('div','slider');
+		scrollbarDiv.appendChild(sliderDiv);		
+		if(thisObject.buttons)
+		{
+			var buttonPreviousDiv = thisObject.Helper.createDocumentElement('div','previous', 'button');
+			var buttonNextDiv = thisObject.Helper.createDocumentElement('div','next', 'button');
+			scrollbarDiv.appendChild(buttonPreviousDiv);
+			scrollbarDiv.appendChild(buttonNextDiv);
+		}
+		
+		/* Create navigation div container beneath images div */
+		var navigationDiv = thisObject.Helper.createDocumentElement('div','navigation');
+		navigationDiv.appendChild(captionDiv);
+		navigationDiv.appendChild(scrollbarDiv);
+	
 		/* Update document structure and return true on success */
 		var success = false;
 		if (thisObject.ImageFlowDiv.appendChild(imagesDiv) &&
 			thisObject.ImageFlowDiv.appendChild(loadingP) &&
 			thisObject.ImageFlowDiv.appendChild(loadingDiv) &&
-			thisObject.ImageFlowDiv.appendChild(captionDiv) &&
-			thisObject.ImageFlowDiv.appendChild(scrollbarDiv))
+			thisObject.ImageFlowDiv.appendChild(navigationDiv))
 		{
 			/* Remove image nodes outside the images div */
 			for(index = 0; index < max; index++)
@@ -219,8 +216,8 @@ function ImageFlow ()
 		return success;
 	};
 
-
-	/* Manages loading progress and calls the refresh function */
+	
+	/* Manage loading progress and call the refresh function */
 	this.loadingProgress = function()
 	{
 		var p = thisObject.loadingStatus();
@@ -244,11 +241,12 @@ function ImageFlow ()
 			document.getElementById(thisObject.ImageFlowID+'_loading').style.display = 'none';
 
 			/* Refresh ImageFlow on window resize - delay adding this event for the IE */
-			window.setTimeout(thisObject.addResizeEvent, 1000);
+			window.setTimeout(thisObject.Helper.addResizeEvent, 1000);
 
-			/* Initialize Mouse and key support */
-			thisObject.initMouseWheel();
+			/* Initialize mouse, touch and key support */
+			thisObject.MouseWheel.init();
 			thisObject.MouseDrag.init();
+			thisObject.Touch.init();
 			thisObject.Key.init();
 
 			/* Call refresh function */
@@ -278,7 +276,7 @@ function ImageFlow ()
 	};
 
 
-	/* Returns loaded images in percent, sets loading bar width and loading text */
+	/* Return loaded images in percent, set loading bar width and loading text */
 	this.loadingStatus = function()
 	{
 		var max = thisObject.imagesDiv.childNodes.length;
@@ -306,37 +304,46 @@ function ImageFlow ()
 		return finished;
 	};
 
-
+	
 	/* Cache EVERYTHING that only changes on refresh or resize of the window */
 	this.refresh = function()
 	{
 		/* Cache global variables */
-		this.iWidth = thisObject.imagesDiv.offsetWidth;
-		this.maxHeight = Math.round(thisObject.iWidth / thisObject.aspectRatio);
+		this.imagesDivWidth = thisObject.imagesDiv.offsetWidth+thisObject.imagesDiv.offsetLeft;
+		this.maxHeight = Math.round(thisObject.imagesDivWidth / thisObject.aspectRatio);
 		this.maxFocus = thisObject.imageFocusMax * thisObject.xStep;
-		this.size = thisObject.iWidth * 0.5;
+		this.size = thisObject.imagesDivWidth * 0.5;
 		this.sliderWidth = thisObject.sliderWidth * 0.5;
-		this.scrollbarWidth = (thisObject.iWidth - ( Math.round(thisObject.sliderWidth) * 2)) * thisObject.scrollbarP;
+		this.scrollbarWidth = (thisObject.imagesDivWidth - ( Math.round(thisObject.sliderWidth) * 2)) * thisObject.scrollbarP;
 		this.imagesDivHeight = Math.round(thisObject.maxHeight * thisObject.imagesHeight);
 		
 		/* Change imageflow div properties */
 		thisObject.ImageFlowDiv.style.height = thisObject.maxHeight + 'px';
 
 		/* Change images div properties */
-		thisObject.imagesDiv.style.height =  thisObject.imagesDivHeight + 'px';
+		thisObject.imagesDiv.style.height =  thisObject.imagesDivHeight + 'px'; 
+		
+		/* Change images div properties */
+		thisObject.navigationDiv.style.height =  (thisObject.maxHeight - thisObject.imagesDivHeight) + 'px'; 
 
 		/* Change captions div properties */
-		thisObject.captionDiv.style.width = thisObject.iWidth + 'px';
-		thisObject.captionDiv.style.marginTop = Math.round(thisObject.iWidth * 0.02) + 'px';
+		thisObject.captionDiv.style.width = thisObject.imagesDivWidth + 'px';
+		thisObject.captionDiv.style.paddingTop = Math.round(thisObject.imagesDivWidth * 0.02) + 'px';
 
 		/* Change scrollbar div properties */
 		thisObject.scrollbarDiv.style.width = thisObject.scrollbarWidth + 'px';
-		thisObject.scrollbarDiv.style.marginTop = Math.round(thisObject.iWidth * 0.02) + 'px';
-		thisObject.scrollbarDiv.style.marginLeft = Math.round(thisObject.sliderWidth + ((thisObject.iWidth - thisObject.scrollbarWidth)/2)) + 'px';
+		thisObject.scrollbarDiv.style.marginTop = Math.round(thisObject.imagesDivWidth * 0.02) + 'px';
+		thisObject.scrollbarDiv.style.marginLeft = Math.round(thisObject.sliderWidth + ((thisObject.imagesDivWidth - thisObject.scrollbarWidth)/2)) + 'px';
 
 		/* Set slider attributes */
 		thisObject.sliderDiv.style.cursor = thisObject.sliderCursor;
 		thisObject.sliderDiv.onmousedown = function () { thisObject.MouseDrag.start(this); return false;};
+		
+		if(thisObject.buttons)
+		{
+			thisObject.buttonPreviousDiv.onclick = function () { thisObject.MouseWheel.handle(1); };
+			thisObject.buttonNextDiv.onclick = function () { thisObject.MouseWheel.handle(-1); };
+		}
 
 		/* Set the reflection multiplicator */
 		var multi = (thisObject.reflections === true) ? thisObject.reflectionP + 1 : 1;
@@ -370,6 +377,7 @@ function ImageFlow ()
 						image.h = image.height;
 					}
 				}
+
 				/* Check source image format. Get image height minus reflection height! */
 				if((image.w) > (image.h / (thisObject.reflectionP + 1)))
 				{
@@ -383,6 +391,13 @@ function ImageFlow ()
 					image.pc = thisObject.percentOther;
 					image.pcMem = thisObject.percentOther;
 				}
+				
+				/* Change image positioning */
+				if(thisObject.imageScaling === false)
+				{		
+					image.style.position = 'relative';
+					image.style.display = 'inline';
+				}
 
 				/* Set image cursor type */
 				image.style.cursor = thisObject.imageCursor;
@@ -390,6 +405,20 @@ function ImageFlow ()
 			}
 		}
 		this.max = thisObject.indexArray.length;
+		
+		/* Override dynamic sizes based on the first image */
+		if(thisObject.imageScaling === false)
+		{
+			var image = thisObject.imagesDiv.childNodes[thisObject.indexArray[0]];
+			
+			/* Set left padding for the first image */
+			this.totalImagesWidth = image.w * thisObject.max;
+			image.style.paddingLeft = (thisObject.imagesDivWidth/2) + (image.w/2) + 'px';
+			
+			/* Override images and navigation div height */
+			thisObject.imagesDiv.style.height =  image.h + 'px';
+			thisObject.navigationDiv.style.height =  (thisObject.maxHeight - image.h) + 'px'; 
+		}
 
 		/* Reset variable */
 		if(thisObject.firstRefresh)
@@ -415,81 +444,115 @@ function ImageFlow ()
 			var image = thisObject.imagesDiv.childNodes[thisObject.indexArray[index]];
 			var currentImage = index * -thisObject.xStep;
 
-			/* Don't display images that are not conf_focussed */
-			if ((currentImage + thisObject.maxFocus) < thisObject.memTarget || (currentImage - thisObject.maxFocus) > thisObject.memTarget)
+			/* Enabled image scaling */
+			if(thisObject.imageScaling)
 			{
-				image.style.visibility = 'hidden';
-				image.style.display = 'none';
+				/* Don't display images that are not conf_focussed */
+				if ((currentImage + thisObject.maxFocus) < thisObject.memTarget || (currentImage - thisObject.maxFocus) > thisObject.memTarget)
+				{
+					image.style.visibility = 'hidden';
+					image.style.display = 'none';
+				}
+				else
+				{
+					var z = (Math.sqrt(10000 + x * x) + 100) * thisObject.imagesM;
+					var xs = x / z * thisObject.size + thisObject.size;
+
+					/* Still hide images until they are processed, but set display style to block */
+					image.style.display = 'block';
+
+					/* Process new image height and image width */
+					var newImageH = (image.h / image.w * image.pc) / z * thisObject.size;
+					var newImageW = 0;
+					switch (newImageH > thisObject.maxHeight)
+					{
+						case false:
+							newImageW = image.pc / z * thisObject.size;
+							break;
+
+						default:
+							newImageH = thisObject.maxHeight;
+							newImageW = image.w * newImageH / image.h;
+							break;
+					}
+
+					var newImageTop = (thisObject.imagesDivHeight - newImageH) + ((newImageH / (thisObject.reflectionP + 1)) * thisObject.reflectionP);
+
+					/* Set new image properties */
+					image.style.left = xs - (image.pc / 2) / z * thisObject.size + 'px';
+					if(newImageW && newImageH)
+					{
+						image.style.height = newImageH + 'px';
+						image.style.width = newImageW + 'px';
+						image.style.top = newImageTop + 'px';
+					}
+					image.style.visibility = 'visible';
+
+					/* Set image layer through zIndex */
+					switch ( x < 0 )
+					{
+						case true:
+							this.zIndex++;
+							break;
+
+						default:
+							this.zIndex = thisObject.zIndex - 1;
+							break;
+					}
+
+					/* Change zIndex and onclick function of the focussed image */
+					switch ( image.i == thisObject.imageID )
+					{
+						case false:
+							image.onclick = function() { thisObject.glideTo(this.i);};
+							break;
+
+						default:
+							this.zIndex = thisObject.zIndex + 1;
+							if(image.url !== '')
+							{
+								image.onclick = thisObject.onClick;
+							}
+							break;
+					}
+					image.style.zIndex = thisObject.zIndex;
+				}
 			}
+
+			/* Disabled image scaling */
 			else
 			{
-				var z = (Math.sqrt(10000 + x * x) + 100) * thisObject.imagesM;
-				var xs = x / z * thisObject.size + thisObject.size;
-
-				/* Still hide images until they are processed, but set display style to block */
-				image.style.display = 'block';
-
-				/* Process new image height and image width */
-				var newImageH = (image.h / image.w * image.pc) / z * thisObject.size;
-				var newImageW = 0;
-				switch (newImageH > thisObject.maxHeight)
+				if ((currentImage + thisObject.maxFocus) < thisObject.memTarget || (currentImage - thisObject.maxFocus) > thisObject.memTarget)
 				{
-					case false:
-						newImageW = image.pc / z * thisObject.size;
-						break;
-
-					default:
-						newImageH = thisObject.maxHeight;
-						newImageW = image.w * newImageH / image.h;
-						break;
+					image.style.visibility = 'hidden';
 				}
-
-				var newImageTop = (thisObject.imagesDivHeight - newImageH) + ((newImageH / (thisObject.reflectionP + 1)) * thisObject.reflectionP);
-
-				/* Set new image properties */
-				image.style.left = xs - (image.pc / 2) / z * thisObject.size + 'px';
-				if(newImageW && newImageH)
+				else
 				{
-					image.style.height = newImageH + 'px';
-					image.style.width = newImageW + 'px';
-					image.style.top = newImageTop + 'px';
-				}
-				image.style.visibility = 'visible';
+					image.style.visibility = 'visible';
 
-				/* Set image layer through zIndex */
-				switch ( x < 0 )
-				{
-					case true:
-						this.zIndex++;
-						break;
+					/* Change onclick function of the focussed image */
+					switch ( image.i == thisObject.imageID )
+					{
+						case false:
+							image.onclick = function() { thisObject.glideTo(this.i);};
+							break;
 
-					default:
-						this.zIndex = thisObject.zIndex - 1;
-						break;
-				}
-
-				/* Change zIndex and onclick function of the focussed image */
-				switch ( image.i == thisObject.imageID )
-				{
-					case false:
-						image.onclick = function() { thisObject.glideTo(this.i);};
-						break;
-
-					default:
-						this.zIndex = thisObject.zIndex + 1;
-						if(image.url !== '')
-						{
-							image.onclick = thisObject.onClick;
-						}
-						break;
-				}
-				image.style.zIndex = thisObject.zIndex;
+						default:
+							if(image.url !== '')
+							{
+								image.onclick = thisObject.onClick;
+							}
+							break;
+					}
+				}	
+				thisObject.imagesDiv.style.marginLeft = (x - thisObject.totalImagesWidth) + 'px';
 			}
+
 			x += thisObject.xStep;
 		}
 	};
 
-
+	
 	/* Initializes image gliding animation */
 	this.glideTo = function(imageID)
 	{
@@ -518,7 +581,7 @@ function ImageFlow ()
 		if(thisObject.opacity === true || thisObject.imageFocusM !== thisObject.defaults.imageFocusM)
 		{
 			/* Set opacity for centered image */
-			thisObject.setOpacity(thisObject.imagesDiv.childNodes[imageID], thisObject.opacityArray[0]);
+			thisObject.Helper.setOpacity(thisObject.imagesDiv.childNodes[imageID], thisObject.opacityArray[0]);
 			thisObject.imagesDiv.childNodes[imageID].pc = thisObject.imagesDiv.childNodes[imageID].pc * thisObject.imageFocusM;
 
 			/* Set opacity for the other images that are displayed */
@@ -543,12 +606,12 @@ function ImageFlow ()
 
 				if (rightID < thisObject.max)
 				{
-					thisObject.setOpacity(thisObject.imagesDiv.childNodes[rightID], opacityValue);
+					thisObject.Helper.setOpacity(thisObject.imagesDiv.childNodes[rightID], opacityValue);
 					thisObject.imagesDiv.childNodes[rightID].pc = thisObject.imagesDiv.childNodes[rightID].pcMem;
 				}
 				if (leftID >= 0)
 				{
-					thisObject.setOpacity(thisObject.imagesDiv.childNodes[leftID], opacityValue);
+					thisObject.Helper.setOpacity(thisObject.imagesDiv.childNodes[leftID], opacityValue);
 					thisObject.imagesDiv.childNodes[leftID].pc = thisObject.imagesDiv.childNodes[leftID].pcMem;
 				}
 			}
@@ -579,89 +642,74 @@ function ImageFlow ()
 				break;
 		}
 	};
-
-
-	/* Set image opacity */
-	this.setOpacity = function(object, value)
+	
+	
+	/* Mouse Wheel support */
+	this.MouseWheel =
 	{
-		if(thisObject.opacity === true)
+		init: function()
 		{
-			object.style.opacity = value/10;
-			object.style.filter = 'alpha(opacity=' + value*10 + ')';
-		}
-	};
-
-
-	/* Initialize mouse wheel support */
-	this.initMouseWheel = function()
-	{
-		if(window.addEventListener)
-		{
-			thisObject.ImageFlowDiv.addEventListener('DOMMouseScroll', thisObject.eventMouseWheel, false);
-		}
-		thisObject.ImageFlowDiv.onmousewheel = thisObject.eventMouseWheel;
-	};
-
-
-	/* Event handler for mouse wheel events */
-	this.eventMouseWheel = function(event)
-	{
-		var delta = 0;
-		if (!event)
-		{
-			event = window.event;
-		}
-		if (event.wheelDelta)
-		{
-			delta = event.wheelDelta / 120;
-		}
-		else if (event.detail)
-		{
-			delta = -event.detail / 3;
-		}
-		if (delta)
-		{
-			thisObject.handleMouseWheel(delta);
-		}
-		if (event.preventDefault)
-		{
-			event.preventDefault();
-		}
-		event.returnValue = false;
-	};
-
-
-	/* Handle the wheel angle change (delta) of the mouse wheel */
-	this.handleMouseWheel = function(delta)
-	{
-		var change = false;
-		var newImageID = 0;
-		if(delta > 0)
-		{
-			if(thisObject.imageID >= 1)
+			/* Init mouse wheel listener */
+			if(window.addEventListener)
 			{
-				newImageID = thisObject.imageID -1;
-				change = true;
+				thisObject.ImageFlowDiv.addEventListener('DOMMouseScroll', thisObject.MouseWheel.get, false);
+			}
+			thisObject.Helper.addEvent(thisObject.ImageFlowDiv,'mousewheel',thisObject.MouseWheel.get);
+		},
+
+		get: function(event)
+		{
+			var delta = 0;
+			if (!event)
+			{
+				event = window.event;
+			}
+			if (event.wheelDelta)
+			{
+				delta = event.wheelDelta / 120;
+			}
+			else if (event.detail)
+			{
+				delta = -event.detail / 3;
+			}
+			if (delta)
+			{
+				thisObject.MouseWheel.handle(delta);
+			}
+			thisObject.Helper.suppressBrowserDefault(event);
+		},
+
+		handle: function(delta)
+		{
+			var change = false;
+			var newImageID = 0;
+			if(delta > 0)
+			{
+				if(thisObject.imageID >= 1)
+				{
+					newImageID = thisObject.imageID -1;
+					change = true;
+				}
+			}
+			else
+			{
+				if(thisObject.imageID < (thisObject.max-1))
+				{
+					newImageID = thisObject.imageID +1;
+					change = true;
+				}
+			}
+
+			/* Glide to next (mouse wheel down) / previous (mouse wheel up) image  */
+			if (change === true)
+			{
+				thisObject.glideTo(newImageID);
 			}
 		}
-		else
-		{
-			if(thisObject.imageID < (thisObject.max-1))
-			{
-				newImageID = thisObject.imageID +1;
-				change = true;
-			}
-		}
-
-		/* Glide to next (mouse wheel down) / previous (mouse wheel up) image */
-		if (change === true)
-		{
-			thisObject.glideTo(newImageID);
-		}
 	};
-
-
-	/* MouseDrag */
+	
+	
+	/* Mouse Dragging*/
 	this.MouseDrag =
 	{
 		object: null,
@@ -673,9 +721,9 @@ function ImageFlow ()
 		/* Init mouse event listener */
 		init: function()
 		{
-			thisObject.addEvent(thisObject.ImageFlowDiv,'mousemove',thisObject.MouseDrag.drag);
-			thisObject.addEvent(thisObject.ImageFlowDiv,'mouseup',thisObject.MouseDrag.stop);
-			thisObject.addEvent(document,'mouseup',thisObject.MouseDrag.stop);
+			thisObject.Helper.addEvent(thisObject.ImageFlowDiv,'mousemove',thisObject.MouseDrag.drag);
+			thisObject.Helper.addEvent(thisObject.ImageFlowDiv,'mouseup',thisObject.MouseDrag.stop);
+			thisObject.Helper.addEvent(document,'mouseup',thisObject.MouseDrag.stop);
 
 			/* Avoid text and image selection while dragging  */
 			thisObject.ImageFlowDiv.onselectstart = function ()
@@ -746,7 +794,108 @@ function ImageFlow ()
 			}
 		}
 	};
+	
+	
+	/* Safari touch events on the iPhone and iPod Touch */
+	this.Touch =
+	{
+		x: 0,		
+		startX: 0,
+		stopX: 0,
+		busy: false,
+		first: true,
 
+		/* Init touch event listener */
+		init: function()
+		{
+			thisObject.Helper.addEvent(thisObject.navigationDiv,'touchstart',thisObject.Touch.start);
+			thisObject.Helper.addEvent(document,'touchmove',thisObject.Touch.handle);
+			thisObject.Helper.addEvent(document,'touchend',thisObject.Touch.stop);	
+		},
+		
+		isOnNavigationDiv: function(e)
+		{	
+			var state = false;
+			if(e.touches)
+			{
+				if(e.touches[0].target === thisObject.navigationDiv)
+				{
+					state = true;
+				}
+			}
+			return state;
+		},
+		
+		getX: function(e)
+		{
+			var x = 0;
+			if(e.touches)
+			{
+				x = e.touches[0].pageX;
+			}
+			return x;		
+		},
+	
+		start: function(e)
+		{
+			thisObject.Touch.startX = thisObject.Touch.getX(e);
+			thisObject.Touch.busy = true;
+			thisObject.Helper.suppressBrowserDefault(e);			
+		},
+		
+		isBusy: function()
+		{
+			var busy = false;
+			if(thisObject.Touch.busy === true)
+			{
+				busy = true;
+			}
+			return busy;
+		},
+
+		/* Handle touch event position within the navigation div */
+		handle: function(e)
+		{
+			if(thisObject.Touch.isBusy && thisObject.Touch.isOnNavigationDiv(e))
+			{
+				if(thisObject.Touch.first)
+				{
+					thisObject.Touch.stopX = ((thisObject.max-1)-thisObject.imageID) * (thisObject.imagesDivWidth / (thisObject.max-1));
+					thisObject.Touch.first = false;
+				}
+				var newX = -(thisObject.Touch.getX(e) - thisObject.Touch.startX - thisObject.Touch.stopX);
+
+				/* Map x-axis touch coordinates in range of the ImageFlow width */
+				if(newX < 0)
+				{
+					newX = 0;
+				}
+				if(newX > thisObject.imagesDivWidth)
+				{
+					newX = thisObject.imagesDivWidth;
+				}
+
+				thisObject.Touch.x = newX;
+				
+				var imageID = Math.round(newX / (thisObject.imagesDivWidth / (thisObject.max-1)));
+				imageID = (thisObject.max-1)-imageID;
+				if(thisObject.imageID !== imageID)
+				{
+					thisObject.glideTo(imageID);
+				}
+				thisObject.Helper.suppressBrowserDefault(e);
+			}
+		},
+
+		stop: function()
+		{
+			thisObject.Touch.stopX = thisObject.Touch.x;
+			//thisObject.Touch.stopX = -(thisObject.Touch.x - thisObject.imagesDivWidth);
+			
+			thisObject.Touch.busy = false;
+		}
+	};
+	
 
 	/* Key support */
 	this.Key =
@@ -765,12 +914,12 @@ function ImageFlow ()
 			{
 				/* Right arrow key */
 				case 39:
-					thisObject.handleMouseWheel(-1);
+					thisObject.MouseWheel.handle(-1);
 					break;
 
 				/* Left arrow key */
 				case 37:
-					thisObject.handleMouseWheel(1);
+					thisObject.MouseWheel.handle(1);
 					break;
 			}
 		},
@@ -782,44 +931,85 @@ function ImageFlow ()
 			return event.keyCode;
 		}
 	};
-
-
-	/* Adds events */
-	this.addEvent = function( obj, type, fn )
+	
+	
+	/* Helper functions */
+	this.Helper =
 	{
-		if (obj.addEventListener)
+		/* Add events */
+		addEvent: function(obj, type, fn)
 		{
-			obj.addEventListener( type, fn, false );
-		}
-		else if (obj.attachEvent)
-		{
-			obj["e"+type+fn] = fn;
-			obj[type+fn] = function() { obj["e"+type+fn]( window.event ); };
-			obj.attachEvent( "on"+type, obj[type+fn] );
-		}
-	};
-
-
-	/* Adds functions to the window.onresize event - can not be done by addEvent */
-	this.addResizeEvent = function()
-	{
-		var otherFunctions = window.onresize;
-		if(typeof window.onresize != 'function')
-		{
-			window.onresize = function()
+			if(obj.addEventListener)
 			{
-				thisObject.refresh();
-			};
-		}
-		else
+				obj.addEventListener(type, fn, false);
+			}
+			else if(obj.attachEvent)
+			{
+				obj["e"+type+fn] = fn;
+				obj[type+fn] = function() { obj["e"+type+fn]( window.event ); };
+				obj.attachEvent( "on"+type, obj[type+fn] );
+			}
+		},
+		
+		/* Set image opacity */
+		setOpacity: function(object, value)
 		{
-			window.onresize = function(){
-				if (otherFunctions)
+			if(thisObject.opacity === true)
+			{
+				object.style.opacity = value/10;
+				object.style.filter = 'alpha(opacity=' + value*10 + ')';
+			}
+		},
+		
+		/* Creates HTML elements */
+		createDocumentElement: function(type, id, optionalClass)
+		{
+			var element = document.createElement(type);
+			element.setAttribute('id',thisObject.ImageFlowID+'_'+id);
+			if(optionalClass !== undefined)
+			{
+				id += ' '+optionalClass;
+			}
+			element.setAttribute('class',id);
+			element.setAttribute('className',id);
+			return element;
+		},
+		
+		/* Suppress default browser behaviour to avoid image/text selection while dragging */
+		suppressBrowserDefault: function(e)
+		{
+			if(e.preventDefault)
+			{
+				e.preventDefault();
+			}
+			else
+			{
+				e.returnValue = false;
+			}
+			return false;
+		},
+		
+		/* Adds functions to the window.onresize event - can not be done by addEvent */
+		addResizeEvent: function()
+		{
+			var otherFunctions = window.onresize;
+			if(typeof window.onresize != 'function')
+			{
+				window.onresize = function()
 				{
-					otherFunctions();
-				}
-				thisObject.refresh();
-			};
+					thisObject.refresh();
+				};
+			}
+			else
+			{
+				window.onresize = function(){
+					if (otherFunctions)
+					{
+						otherFunctions();
+					}
+					thisObject.refresh();
+				};
+			}
 		}
 	};
 }
