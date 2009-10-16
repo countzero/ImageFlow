@@ -1,39 +1,41 @@
-@charset 'utf-8';
+@charset "utf-8";
 
 /* ImageFlow Settings - CSS 2.1
 ==================================== */
 @media screen, projection {
 	.imageflow {
 		visibility:hidden;
-		position: relative; 
-		text-align: left;
-		width: 100%;		
+		position:relative; 
+		text-align:left;
+		width:100%;
+		overflow:hidden;
 	}
 	.imageflow img {
 		visibility:hidden;
-		position: absolute; 
-		top: 0px;
-		border: none;
+		position:absolute; 
+		top:0px;
+		border:none;
+		-ms-interpolation-mode:bicubic; /* Enables bicubic image resampling for the IE7 */
 	}
 	.imageflow p{
 		text-align:center;
 		margin:0 auto;
 	}
 	.imageflow .loading {
-		position: relative;
-		left: 50%;
-		margin-left: -106px;
-		width: 200px;
-		height: 15px;
+		position:relative;
+		left:50%;
+		margin-left:-106px;
+		width:200px;
+		height:15px;
 		padding:5px;
-		visibility: visible;
-		border: 1px solid white;
+		visibility:visible;
+		border:1px solid white;
 	}
 	.imageflow .loading_bar {
-		height: 15px;
-		width: 1%;
-		background: #fff;
-		visibility: visible;
+		height:15px;
+		width:1%;
+		background:#fff;
+		visibility:visible;
 	}
 	.imageflow .caption {
 		font-weight:bold;

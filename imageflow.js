@@ -1,6 +1,6 @@
 /*
 Name:       ImageFlow
-Version:    1.0.3 (December 26 2008)
+Version:    1.1 (March 13 2008)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -39,35 +39,42 @@ function ImageFlow ()
 	/* Setting option defaults */
 	this.defaults =
 	{
+		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
+		captions:           true,           /* Toggle captions */
+		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
+		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
+		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
+		imagesHeight:       0.67,           /* Height of the images div container in percent */
+		imagesM:            1.0,            /* Multiplicator for all images in percent */
+		onClick:            function() { document.location = this.url; },   /* Onclick behaviour */
+		opacity:            false,          /* Toggle image opacity */
+		opacityArray:       [10,8,6,4,2],   /* Image opacity (range: 0 to 10) first value is for the focussed image */
+		percentLandscape:   118,            /* Scale landscape format */
+		percentOther:       100,            /* Scale portrait and square format */
 		preloadImages:      true,           /* Toggles loading bar (false: requires img attributes height and width) */
 		reflections:        true,           /* Toggle reflections */
-		reflectionP:        0.5,            /* Height of the reflection in % of the source image */
-		reflectionPNG:      false,          /* Toggle reflect2.php or reflect3.php */
 		reflectionGET:      '',             /* Pass variables via the GET method to the reflect_.php script */
-		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
-		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
-		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
-		startID:            1,              /* Glide to this image ID on startup */
-		startAnimation:     false,          /* Animate images moving in from the right on startup */
+		reflectionP:        0.5,            /* Height of the reflection in percent of the source image */
+		reflectionPNG:      false,          /* Toggle reflect2.php or reflect3.php */
+		scrollbarP:         0.6,            /* Width of the scrollbar in percent */
 		slider:             true,           /* Toggle slider */
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
 		sliderWidth:        14,             /* Width of the slider in px */
-		xStep:              150,            /* Step width on the x-axis in px */
-		captions:           true,           /* Toggle captions */
-		opacity:            false,          /* Toggle image opacity */
-		opacityArray:       [10,8,6,4,2],   /* Image opacity (range: 0 to 10) first value is for the focussed image */
-		onClick:            function() { document.location = this.url; }   /* Onclick behaviour */
+		startID:            1,              /* Glide to this image ID on startup */
+		startAnimation:     false,          /* Animate images moving in from the right on startup */
+		xStep:              150             /* Step width on the x-axis in px */
 	};
 
 	/* Closure for this */
 	var thisObject = this;
 
+
 	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		var optionsArray = new Array('ImageFlowID', 'preloadImages', 'reflections', 'reflectionP', 'reflectionPNG', 'reflectionGET', 'imageFocusMax', 'imageFocusM', 'imageCursor', 'startID', 'startAnimation', 'slider', 'sliderCursor', 'sliderWidth', 'xStep', 'captions', 'opacity', 'opacityArray', 'onClick');
+		var optionsArray = new Array( 'aspectRatio', 'captions', 'imageCursor', 'imagesM', 'ImageFlowID', 'imageFocusM', 'imageFocusMax', 'imagesHeight', 'onClick', 'opacity', 'opacityArray', 'percentLandscape', 'percentOther', 'preloadImages', 'reflections', 'reflectionGET', 'reflectionP', 'reflectionPNG', 'scrollbarP', 'slider', 'sliderCursor', 'sliderWidth', 'startID', 'startAnimation', 'xStep' );
 		var max = optionsArray.length;
 		for (var i = 0; i < max; i++)
 		{
@@ -108,7 +115,7 @@ function ImageFlow ()
 
 				/* Set height of the ImageFlow container and center the loading bar */
 				var width = this.ImageFlowDiv.offsetWidth;
-				var height = Math.round(width * 0.5085);
+				var height = Math.round(width / thisObject.aspectRatio);
 				document.getElementById(thisObject.ImageFlowID+'_loading_txt').style.paddingTop = ((height * 0.5) -22) + 'px';
 				ImageFlowDiv.style.height = height + 'px';
 
@@ -117,6 +124,7 @@ function ImageFlow ()
 			}
 		}
 	};
+
 
 	/* Create HTML Structure */
 	this.createStructure = function()
@@ -238,12 +246,6 @@ function ImageFlow ()
 			/* Refresh ImageFlow on window resize - delay adding this event for the IE */
 			window.setTimeout(thisObject.addResizeEvent, 1000);
 
-			/* Fixes the back button issue */
-			window.onunload = function()
-			{
-				document = null;
-			};
-
 			/* Initialize Mouse and key support */
 			thisObject.initMouseWheel();
 			thisObject.MouseDrag.init();
@@ -310,26 +312,27 @@ function ImageFlow ()
 	{
 		/* Cache global variables */
 		this.iWidth = thisObject.imagesDiv.offsetWidth;
-		this.maxHeight = Math.round(thisObject.iWidth * 0.51);
+		this.maxHeight = Math.round(thisObject.iWidth / thisObject.aspectRatio);
 		this.maxFocus = thisObject.imageFocusMax * thisObject.xStep;
 		this.size = thisObject.iWidth * 0.5;
-		this.scrollbarWidth = Math.round(thisObject.iWidth * 0.6);
 		this.sliderWidth = thisObject.sliderWidth * 0.5;
-
+		this.scrollbarWidth = (thisObject.iWidth - ( Math.round(thisObject.sliderWidth) * 2)) * thisObject.scrollbarP;
+		this.imagesDivHeight = Math.round(thisObject.maxHeight * thisObject.imagesHeight);
+		
 		/* Change imageflow div properties */
 		thisObject.ImageFlowDiv.style.height = thisObject.maxHeight + 'px';
 
 		/* Change images div properties */
-		thisObject.imagesDiv.style.height = Math.round(thisObject.iWidth * 0.338) + 'px';
+		thisObject.imagesDiv.style.height =  thisObject.imagesDivHeight + 'px';
 
 		/* Change captions div properties */
 		thisObject.captionDiv.style.width = thisObject.iWidth + 'px';
-		thisObject.captionDiv.style.marginTop = Math.round(thisObject.iWidth * 0.03) + 'px';
+		thisObject.captionDiv.style.marginTop = Math.round(thisObject.iWidth * 0.02) + 'px';
 
 		/* Change scrollbar div properties */
 		thisObject.scrollbarDiv.style.width = thisObject.scrollbarWidth + 'px';
 		thisObject.scrollbarDiv.style.marginTop = Math.round(thisObject.iWidth * 0.02) + 'px';
-		thisObject.scrollbarDiv.style.marginLeft = Math.round(thisObject.iWidth * 0.2) + 'px';
+		thisObject.scrollbarDiv.style.marginLeft = Math.round(thisObject.sliderWidth + ((thisObject.iWidth - thisObject.scrollbarWidth)/2)) + 'px';
 
 		/* Set slider attributes */
 		thisObject.sliderDiv.style.cursor = thisObject.sliderCursor;
@@ -371,14 +374,14 @@ function ImageFlow ()
 				if((image.w) > (image.h / (thisObject.reflectionP + 1)))
 				{
 					/* Landscape format */
-					image.pc = 118;
-					image.pcMem = 118;
+					image.pc = thisObject.percentLandscape;
+					image.pcMem = thisObject.percentLandscape;
 				}
 				else
 				{
 					/* Portrait and square format */
-					image.pc = 100;
-					image.pcMem = 100;
+					image.pc = thisObject.percentOther;
+					image.pcMem = thisObject.percentOther;
 				}
 
 				/* Set image cursor type */
@@ -395,8 +398,8 @@ function ImageFlow ()
 		}
 
 		/* Display images in current order */
-		thisObject.moveTo(thisObject.current);
 		thisObject.glideTo(thisObject.imageID);
+		thisObject.moveTo(thisObject.current);
 	};
 
 
@@ -420,7 +423,7 @@ function ImageFlow ()
 			}
 			else
 			{
-				var z = Math.sqrt(10000 + x * x) + 100;
+				var z = (Math.sqrt(10000 + x * x) + 100) * thisObject.imagesM;
 				var xs = x / z * thisObject.size + thisObject.size;
 
 				/* Still hide images until they are processed, but set display style to block */
@@ -440,7 +443,8 @@ function ImageFlow ()
 						newImageW = image.w * newImageH / image.h;
 						break;
 				}
-				var newImageTop = (thisObject.iWidth * 0.34 - newImageH) + ((newImageH / (thisObject.reflectionP + 1)) * thisObject.reflectionP);
+
+				var newImageTop = (thisObject.imagesDivHeight - newImageH) + ((newImageH / (thisObject.reflectionP + 1)) * thisObject.reflectionP);
 
 				/* Set new image properties */
 				image.style.left = xs - (image.pc / 2) / z * thisObject.size + 'px';
@@ -515,8 +519,8 @@ function ImageFlow ()
 		{
 			/* Set opacity for centered image */
 			thisObject.setOpacity(thisObject.imagesDiv.childNodes[imageID], thisObject.opacityArray[0]);
-            thisObject.imagesDiv.childNodes[imageID].pc = thisObject.imagesDiv.childNodes[imageID].pc * thisObject.imageFocusM;
- 
+			thisObject.imagesDiv.childNodes[imageID].pc = thisObject.imagesDiv.childNodes[imageID].pc * thisObject.imageFocusM;
+
 			/* Set opacity for the other images that are displayed */
 			var opacityValue = 0;
 			var rightID = 0;
@@ -734,14 +738,15 @@ function ImageFlow ()
 				var imageID = Math.round(step);
 				thisObject.MouseDrag.newX = newX;
 				thisObject.MouseDrag.object.style.left = newX + 'px';
-                if(thisObject.imageID !== imageID)
-                {
-                    thisObject.glideTo(imageID);
-                }
+				if(thisObject.imageID !== imageID)
+				{
+					thisObject.glideTo(imageID);
+				}
 				thisObject.MouseDrag.busy = true;
 			}
 		}
 	};
+
 
 	/* Key support */
 	this.Key =
@@ -794,6 +799,7 @@ function ImageFlow ()
 		}
 	};
 
+
 	/* Adds functions to the window.onresize event - can not be done by addEvent */
 	this.addResizeEvent = function()
 	{
@@ -817,7 +823,6 @@ function ImageFlow ()
 		}
 	};
 }
-
 
 /* DOMContentLoaded event handler - by Tanny O'Haley [4] */
 var domReadyEvent =
@@ -984,6 +989,7 @@ var domReadyEvent =
 
 var domReady = function(handler) { domReadyEvent.add(handler); };
 domReadyEvent.init();
+
 
 /* Create ImageFlow instances when the DOM structure has been loaded */
 domReady(function()
