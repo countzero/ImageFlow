@@ -1,0 +1,60 @@
+@charset 'utf-8';
+
+/* ImageFlow Settings - CSS 2.1
+==================================== */
+@media screen, projection {
+	.imageflow {
+		visibility:hidden;
+		position: relative; 
+		text-align: left;
+		width: 100%;		
+	}
+	.imageflow img {
+		visibility:hidden;
+		position: absolute; 
+		top: 0px;
+		border: none;
+	}
+	.imageflow p{
+		text-align:center;
+		margin:0 auto;
+	}
+	.imageflow .loading {
+		position: relative;
+		left: 50%;
+		margin-left: -106px;
+		width: 200px;
+		height: 15px;
+		padding:5px;
+		visibility: visible;
+		border: 1px solid white;
+	}
+	.imageflow .loading_bar {
+		height: 15px;
+		width: 1%;
+		background: #fff;
+		visibility: visible;
+	}
+	.imageflow .caption {
+		font-weight:bold;
+		position:relative; 
+		text-align:center;
+		z-index:10000;
+	}
+	.imageflow .scrollbar {
+		visibility:hidden;
+		position:relative; 
+		border-bottom:1px solid #b3b3b3;
+		z-index:10001;
+	}
+	.imageflow .slider {
+		position:absolute;
+		margin-top:-7px;
+		margin-left:-7px;
+		z-index:10002;
+		background-image:url(slider.png);
+		background-repeat:no-repeat;
+		width:14px;
+		height:14px;
+	}
+}
