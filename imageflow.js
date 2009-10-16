@@ -1,6 +1,6 @@
 /*
 Name:       ImageFlow
-Version:    1.0.1 (October 20 2008)
+Version:    1.0.2 (November 10 2008)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -57,37 +57,27 @@ function ImageFlow ()
 		xStep:              150,            /* Step width on the x-axis in px */
 		captions:           true,           /* Toggle captions */
 		opacity:            false,          /* Toggle image opacity */
-		opacityArray:       [10,8,6,4,2]    /* Image opacity (range: 0 to 10) first value is for the focussed image */
+		opacityArray:       [10,8,6,4,2],   /* Image opacity (range: 0 to 10) first value is for the focussed image */
+		onClick:            function() { document.location = this.url; }   /* Onclick behaviour */
 	};
 
 	/* Closure for this */
 	var thisObject = this;
 
-	/* init ImageFlow */
+	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		this.ID             = (options !== undefined && options.ImageFlowID !== undefined) ? options.ImageFlowID : thisObject.defaults.ImageFlowID;
-		this.preloadImages  = (options !== undefined && options.preloadImages !== undefined) ? options.preloadImages : thisObject.defaults.preloadImages;
-		this.reflections    = (options !== undefined && options.reflections !== undefined) ? options.reflections : thisObject.defaults.reflections;
-		this.reflectionP    = (options !== undefined && options.reflectionP !== undefined) ? options.reflectionP : thisObject.defaults.reflectionP;
-		this.reflectionPNG  = (options !== undefined && options.reflectionPNG !== undefined) ? options.reflectionPNG : thisObject.defaults.reflectionPNG;
-		this.reflectionGET  = (options !== undefined && options.reflectionGET !== undefined) ? options.reflectionGET : thisObject.defaults.reflectionGET;
-		this.imageFocusMax  = (options !== undefined && options.imageFocusMax !== undefined) ? options.imageFocusMax : thisObject.defaults.imageFocusMax;
-		this.imageFocusM    = (options !== undefined && options.imageFocusM !== undefined) ? options.imageFocusM : thisObject.defaults.imageFocusM;
-		this.imageCursor    = (options !== undefined && options.imageCursor !== undefined) ? options.imageCursor : thisObject.defaults.imageCursor;
-		this.startID        = (options !== undefined && options.startID !== undefined) ? options.startID : thisObject.defaults.startID;
-		this.startAnimation = (options !== undefined && options.startAnimation !== undefined) ? options.startAnimation : thisObject.defaults.startAnimation;
-		this.slider         = (options !== undefined && options.slider !== undefined) ? options.slider : thisObject.defaults.slider;
-		this.sliderCursor   = (options !== undefined && options.sliderCursor !== undefined) ? options.sliderCursor : thisObject.defaults.sliderCursor;
-		this.sliderWidth    = (options !== undefined && options.sliderWidth !== undefined) ? options.sliderWidth : thisObject.defaults.sliderWidth;
-		this.xStep          = (options !== undefined && options.xStep !== undefined) ? options.xStep : thisObject.defaults.xStep;
-		this.captions       = (options !== undefined && options.captions !== undefined) ? options.captions : thisObject.defaults.captions;
-		this.opacity        = (options !== undefined && options.opacity !== undefined) ? options.opacity : thisObject.defaults.opacity;
-		this.opacityArray   = (options !== undefined && options.opacityArray !== undefined) ? options.opacityArray : thisObject.defaults.opacityArray;
-		
-		/* Try to get ImageFlow div element */		
-		var ImageFlowDiv = document.getElementById(thisObject.ID);
+		var optionsArray = new Array('ImageFlowID', 'preloadImages', 'reflections', 'reflectionP', 'reflectionPNG', 'reflectionGET', 'imageFocusMax', 'imageFocusM', 'imageCursor', 'startID', 'startAnimation', 'slider', 'sliderCursor', 'sliderWidth', 'xStep', 'captions', 'opacity', 'opacityArray', 'onClick');
+		var max = optionsArray.length;
+		for (var i = 0; i < max; i++)
+		{
+			var name = optionsArray[i];
+			this[name] = (options !== undefined && options[name] !== undefined) ? options[name] : thisObject.defaults[name];
+		}
+
+		/* Try to get ImageFlow div element */
+		var ImageFlowDiv = document.getElementById(thisObject.ImageFlowID);
 		if(ImageFlowDiv)
 		{
 			/* Set it global within the ImageFlow scope */
@@ -97,10 +87,10 @@ function ImageFlow ()
 			/* Try to create XHTML structure */
 			if(this.createStructure())
 			{
-				this.imagesDiv = document.getElementById(thisObject.ID+'_images');
-				this.captionDiv = document.getElementById(thisObject.ID+'_caption');
-				this.scrollbarDiv = document.getElementById(thisObject.ID+'_scrollbar');
-				this.sliderDiv = document.getElementById(thisObject.ID+'_slider');
+				this.imagesDiv = document.getElementById(thisObject.ImageFlowID+'_images');
+				this.captionDiv = document.getElementById(thisObject.ImageFlowID+'_caption');
+				this.scrollbarDiv = document.getElementById(thisObject.ImageFlowID+'_scrollbar');
+				this.sliderDiv = document.getElementById(thisObject.ImageFlowID+'_slider');
 			
 				this.indexArray = [];
 				this.current = 0;
@@ -120,7 +110,7 @@ function ImageFlow ()
 				/* Set height of the ImageFlow container and center the loading bar */
 				var width = this.ImageFlowDiv.offsetWidth;
 				var height = Math.round(width * 0.5085);
-				document.getElementById(thisObject.ID+'_loading_txt').style.paddingTop = ((height * 0.5) -22) + 'px';
+				document.getElementById(thisObject.ImageFlowID+'_loading_txt').style.paddingTop = ((height * 0.5) -22) + 'px';
 				ImageFlowDiv.style.height = height + 'px';
 
 				/* Init loading progress */
@@ -134,7 +124,7 @@ function ImageFlow ()
 	{
 		/* Create images div container */
 		var imagesDiv = document.createElement('div');		
-		imagesDiv.setAttribute('id',thisObject.ID+'_images');
+		imagesDiv.setAttribute('id',thisObject.ImageFlowID+'_images');
 		imagesDiv.setAttribute('class','images');
 		imagesDiv.setAttribute('className','images');
 
@@ -167,35 +157,35 @@ function ImageFlow ()
 		/* Create loading text container */
 		var loadingP = document.createElement('p');
 		var loadingText = document.createTextNode(' ');
-		loadingP.setAttribute('id',thisObject.ID+'_loading_txt');
+		loadingP.setAttribute('id',thisObject.ImageFlowID+'_loading_txt');
 		loadingP.appendChild(loadingText);
 		
 		/* Create loading div container */
 		var loadingDiv = document.createElement('div');
-		loadingDiv.setAttribute('id',thisObject.ID+'_loading');
+		loadingDiv.setAttribute('id',thisObject.ImageFlowID+'_loading');
 		loadingDiv.setAttribute('class','loading');
 		loadingDiv.setAttribute('className','loading');
 			
 		/* Create loading bar div container inside the loading div */
 		var loadingBarDiv = document.createElement('div');
-		loadingBarDiv.setAttribute('id',thisObject.ID+'_loading_bar');
+		loadingBarDiv.setAttribute('id',thisObject.ImageFlowID+'_loading_bar');
 		loadingBarDiv.setAttribute('class','loading_bar');
 		loadingBarDiv.setAttribute('className','loading_bar');
 		loadingDiv.appendChild(loadingBarDiv);
 
 		/* Create captions div container */
 		var captionDiv = document.createElement('div');
-		captionDiv.setAttribute('id',thisObject.ID+'_caption');
+		captionDiv.setAttribute('id',thisObject.ImageFlowID+'_caption');
 		captionDiv.setAttribute('class','caption');
 		captionDiv.setAttribute('className','caption');
 
 		/* Create slider div container inside the scrollbar div */
 		var scrollbarDiv = document.createElement('div');
-		scrollbarDiv.setAttribute('id',thisObject.ID+'_scrollbar');
+		scrollbarDiv.setAttribute('id',thisObject.ImageFlowID+'_scrollbar');
 		scrollbarDiv.setAttribute('class','scrollbar');
 		scrollbarDiv.setAttribute('className','scrollbar');
 		var sliderDiv = document.createElement('div');
-		sliderDiv.setAttribute('id',thisObject.ID+'_slider');
+		sliderDiv.setAttribute('id',thisObject.ImageFlowID+'_slider');
 		sliderDiv.setAttribute('class','slider');
 		sliderDiv.setAttribute('className','slider');
 		scrollbarDiv.appendChild(sliderDiv);
@@ -243,8 +233,8 @@ function ImageFlow ()
 		else
 		{
 			/* Hide loading elements */
-			document.getElementById(thisObject.ID+'_loading_txt').style.display = 'none';
-			document.getElementById(thisObject.ID+'_loading').style.display = 'none';
+			document.getElementById(thisObject.ImageFlowID+'_loading_txt').style.display = 'none';
+			document.getElementById(thisObject.ImageFlowID+'_loading').style.display = 'none';
 
 			/* Refresh ImageFlow on window resize - delay adding this event for the IE */
 			window.setTimeout(thisObject.addResizeEvent, 1000);
@@ -264,7 +254,7 @@ function ImageFlow ()
 			thisObject.refresh(true);
 
 			/* Unhide scrollbar elements */
-			document.getElementById(thisObject.ID+'_scrollbar').style.visibility = 'visible';
+			document.getElementById(thisObject.ImageFlowID+'_scrollbar').style.visibility = 'visible';
 
 			/* Glide to start image */
 			var startID = thisObject.startID-1;
@@ -306,10 +296,10 @@ function ImageFlow ()
 			}
 		}
 		var finished = Math.round((completed/i)*100);
-		var loadingBar = document.getElementById(thisObject.ID+'_loading_bar');
+		var loadingBar = document.getElementById(thisObject.ImageFlowID+'_loading_bar');
 		loadingBar.style.width = finished+'%';
 
-		var loadingP = document.getElementById(thisObject.ID+'_loading_txt');
+		var loadingP = document.getElementById(thisObject.ImageFlowID+'_loading_txt');
 		var loadingTxt = document.createTextNode('loading images '+completed+'/'+i);
 		loadingP.replaceChild(loadingTxt,loadingP.firstChild);
 		return finished;
@@ -486,7 +476,7 @@ function ImageFlow ()
 						this.zIndex = thisObject.zIndex + 1;
 						if(image.url !== '')
 						{
-							image.onclick = function() { document.location = this.url; };
+							image.onclick = thisObject.onClick;
 						}
 						break;
 				}
@@ -758,13 +748,13 @@ function ImageFlow ()
 		/* Init key event listener */
 		init: function() 
 		{
-			thisObject.ImageFlowDiv.onkeydown = function(){ thisObject.Key.handle(event); };
+			document.onkeydown = function(event){ thisObject.Key.handle(event); };
 		},
 
 		/* Handle the arrow keys */
 		handle: function(event)
 		{
-			var charCode  = thisObject.Key.get();
+			var charCode  = thisObject.Key.get(event);
 			switch (charCode)
 			{
 				/* Right arrow key */
@@ -993,7 +983,6 @@ var domReadyEvent =
 
 var domReady = function(handler) { domReadyEvent.add(handler); };
 domReadyEvent.init();
-
 
 /* Create ImageFlow instances when the DOM structure has been loaded */
 domReady(function()
