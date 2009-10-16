@@ -18,12 +18,6 @@ h1 {
 a{
 	color:#fff;
 }
-.none{
-	visibility:hidden;
-}
-.none div{
-	display:none;
-}
 .clear{
 	clear:both;
 }
@@ -73,4 +67,7 @@ a{
 #changelog div{
 	text-align: justify;
 	padding: 0 15px 5px 15px;
+}
+.none{
+	display:none;
 }

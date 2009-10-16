@@ -1,5 +1,5 @@
 /**
- *	ImageFlow 0.5.1
+ *	ImageFlow 0.6
  *
  *	This code is based on Michael L. Perrys Cover flow in Javascript.
  *	For he wrote that "You can take this code and use it as your own" [1]
@@ -96,7 +96,7 @@ function moveTo(x)
 		var current_image = index * -150;
 
 		/* Don't display images that are not focussed */
-		if ((current_image+focus) < mem_target || (current_image-focus) > mem_target)
+		if ((current_image+max_focus) < mem_target || (current_image-max_focus) > mem_target)
 		{
 			image.style.visibility="hidden";
 			image.style.display="none";
@@ -108,7 +108,7 @@ function moveTo(x)
 
 			/* Still hide images until they are processed, but set display style to block */
 			image.style.display="block";
-
+	
 			/* Get current image properties */
 			var img_h = image.height;
 			var img_w = image.width;
@@ -129,10 +129,10 @@ function moveTo(x)
 			
 			/* Process new image height and top spacing */
 			var new_img_h = (img_h / img_w * img_percent) / z * size;
-			var new_img_top = (images_width * 0.33 - new_img_h) + images_top + ((new_img_h / (reflection_p + 1)) * reflection_p);
+			var new_img_top = (images_width * 0.34 - new_img_h) + images_top + ((new_img_h / (reflection_p + 1)) * reflection_p);
 		
 			/* Set new image properties */
-			image.style.left = xs - (img_percent / 2) / z * size + imageflow_left + "px";
+			image.style.left = xs - (img_percent / 2) / z * size + images_left + "px";
 			image.style.height = new_img_h + "px";
 			image.style.width= "";
 			image.style.top = new_img_top + "px";
@@ -158,34 +158,39 @@ function moveTo(x)
 /* Main function */
 function refresh()
 {
+
 	/* Cache document objects in global script variables */
+	imageflow_div = document.getElementById("imageflow");
 	img_div = document.getElementById("images");
-	caption_div = document.getElementById("captions");
 	scrollbar_div = document.getElementById("scrollbar");
 	slider_div = document.getElementById("scrollbar_slider");
+	caption_div = document.getElementById("captions");
+	caption_div.innerHTML = document.getElementById(caption_id).innerHTML;
+
+	/* Cache global variables, that only change on refresh */
+	images_width = img_div.offsetWidth;
+	images_top = imageflow_div.offsetTop;
+	images_left = imageflow_div.offsetLeft;
+	max_focus = focus * 150;
+	size = images_width * 0.5;
+	max = img_div.childNodes.length;
+	scrollbar_width = images_width * 0.6;
+	slider_width = slider_width * 0.5;
+	
+	/* Change imageflow div properties */
+	imageflow_div.style.height = images_width * 0.51 + "px";
 
 	/* Change images div properties */
-	images_width = img_div.offsetWidth;
-	var images_height = images_width * 0.33;
-	img_div.style.height = images_height + "px";
+	img_div.style.height = images_width * 0.338 + "px";
 
 	/* Change captions div properties */
 	caption_div.style.width = images_width + "px";
 	caption_div.style.marginTop = images_width * 0.03 + "px";
-	caption_div.innerHTML = document.getElementById(caption_id).innerHTML;
 
 	/* Change scrollbar div properties */
-	slider_width = slider_width * 0.5;
-	scrollbar_width = images_width * 0.6;
 	scrollbar_div.style.marginTop = images_width * 0.02 + "px";
 	scrollbar_div.style.marginLeft = images_width * 0.2 + "px";
 	scrollbar_div.style.width = scrollbar_width + "px";
-
-	/* Cache global variables, that only change on refresh */
-	imageflow_left = document.getElementById("imageflow").offsetLeft;
-	images_top = img_div.offsetTop;
-	size = images_width * 0.5;
-	max = img_div.childNodes.length;
 	
 	/* Cache correct node type indices in an array */
 	var count=0;
@@ -199,10 +204,6 @@ function refresh()
 		}
 	}
 	max = array_images.length;
-	
-	/* This variable sets the focus: max number of images displayed on each side of the current one */
-	focus = 4;
-	focus = focus * 150;
 
 	/* Display images in current order */
 	moveTo(current);
@@ -217,6 +218,7 @@ function show(id) {
 function hide(id) {
 	var element = document.getElementById(id);
 	element.style.visibility = "hidden";
+	element.style.display = "none";
 }
 
 /* Hide loading bar, show content and initialize mouse event listening after loading */
@@ -291,8 +293,8 @@ function wheel(event)
 /* Initialize mouse wheel event listener */
 function initMouseWheel()
 {
-	if(window.addEventListener) window.addEventListener('DOMMouseScroll', wheel, false);
-	window.onmousewheel = document.onmousewheel = wheel;
+	if(window.addEventListener) imageflow_div.addEventListener('DOMMouseScroll', wheel, false);
+	imageflow_div.onmousewheel = wheel;
 }
 
 /* This function is called to drag an object (= slider div) */
@@ -338,4 +340,26 @@ function initMouseDrag()
 {
 	document.onmousemove = drag;
 	document.onmouseup = dragstop;
+}
+
+
+function getKeyCode(event) {
+   event = event || window.event;
+   return event.keyCode;
+}
+
+document.onkeydown = function(event) {
+	var charCode  = getKeyCode(event);
+	switch (charCode)
+	{
+		/* Right arrow key */
+		case 39:
+			handle(-1);
+			break;
+		
+		/* Left arrow key */
+		case 37:
+			handle(1);
+			break;
+	}
 }

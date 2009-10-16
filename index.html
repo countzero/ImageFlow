@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
-<title>ImageFlow 0.5.1</title>
+<title>ImageFlow 0.6</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
 <meta name="language" content="de" />
 <meta name="description" content="ImageFlow ist eine Bildergallerie in Javascript, angelehnt an Apples CoverFlow."/>
@@ -15,12 +15,22 @@
 <body>
 <div id="changelog">
 	<div>
-		<b>Download:</b> <a href="ImageFlow_0.5.1.rar">ImageFlow_0.5.1.rar</a> [22 KB]<br/>
+		<b>Download:</b> <a href="ImageFlow_0.6.rar">ImageFlow_0.6.rar</a> [22 KB]<br/>
 		<br/>
 		You are free to use this in any product, or on any web site. For more information about ImageFlow read the <a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=5&s_id=21">Documentation</a> and check my <a target="_top" href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog</a>. For anything else simply drop me a line in my <a href="http://shoutbox.finnrudolph.de/">Shoutbox</a>.<br/><br/>
 		<br/>
 		<b>ChangeLog</b><br/>
 		<br/>
+		Version 0.6
+		<ul>
+			<li>Added arrow key support<br/></li>
+			<li>Improved usability: now it just interacts on mouse wheel events if the cursor is <i>over</i> the main div container "imageflow"<br/></li>
+			<li>Improved div container positioning<br/></li>
+			<li>Fixed a bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&s_id=15&ShowEntry=1196111855">description</a>)<br/></li>
+		</ul>
+		<p id="lnk" style="display:inline;"><a style="text-decoration:underline;" onclick="document.getElementById('log').style.display='block'; document.getElementById('lnk').style.display='none';refresh();" >Show full ChangeLog</a><br/><br/><br/></p>
+	</div>
+	<div style="text-align:left;display:none;padding-top:10px;" id="log">
 		Version 0.5.1
 		<ul>
 			<li>Fixed a mouse wheel bug (<a href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=14&s_id=15&ShowEntry=1195662384">description</a>)<br/></li>
@@ -32,9 +42,7 @@
 			<li>Added scrollbar<br/></li>
 			<li>Fixed display order of loading procedure<br/></li>
 		</ul>
-		<p id="lnk" style="display:inline;"><a style="text-decoration:underline;" onclick="document.getElementById('log').style.display='block'; document.getElementById('lnk').style.display='none';refresh();" >Show full ChangeLog</a><br/><br/><br/></p>
-	</div>
-	<div style="text-align:left;display:none;padding-top:10px;" id="log">
+		<br/>
 		Version 0.4
 		<ul>
 			<li>Added mouse wheel support<br/></li>
@@ -86,8 +94,8 @@
 	</div>
 </div>
 
+<h1>ImageFlow 0.6</h1><br/>
 <div id="imageflow">
-	<h1>ImageFlow 0.5.1</h1>
 	<div id="loading">
 		<b>Loading images</b><br/>
 		<img src="loading.gif" width="208" height="13" alt="" />
@@ -201,6 +209,7 @@
 		<div id="i50"><b>Image 50</b></div>
 	</div>
 </div>
+
 <div class="clear"></div>
 
 <!-- The following javascript is Google Analytics trackingcode and has nothing to do with ImageFlow -->
