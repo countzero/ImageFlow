@@ -1,6 +1,6 @@
 /*
-Name:       ImageFlow
-Version:    1.2.1 (August 10 2009)
+Name:       ImageFlow - (Marriot International)
+Version:    1.2.2 (Oktober 16 2009)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -359,6 +359,9 @@ function ImageFlow ()
 			{
 				this.indexArray[i] = index;
 
+				/* Get iframe name via the image class */
+				image.iframeId = image.className;
+				
 				/* Set image attributes to store values */
 				image.url = image.getAttribute('longdesc');
 				image.xPosition = (-i * thisObject.xStep);
@@ -505,6 +508,11 @@ function ImageFlow ()
 					{
 						case false:
 							image.onclick = function() { thisObject.glideTo(this.i);};
+							if(image.iframeId)
+							{
+								var iframe = document.getElementById(image.iframeId);
+								iframe.style.visibility = 'hidden';
+							}
 							break;
 
 						default:
@@ -512,6 +520,23 @@ function ImageFlow ()
 							if(image.url !== '')
 							{
 								image.onclick = thisObject.onClick;
+							}
+							
+							/* Display iFrame and scale it like the image */
+							if(image.iframeId)
+							{
+								
+								var iframe = document.getElementById(image.iframeId);
+								
+								iframe.style.left = image.offsetLeft + 'px';
+								if(newImageW && newImageH)
+								{
+									iframe.style.height = image.height + 'px';
+									iframe.style.width = image.width + 'px';
+									iframe.style.top = image.offsetTop + thisObject.ImageFlowDiv.offsetTop + 'px';
+								}
+								iframe.style.visibility = 'visible';
+					
 							}
 							break;
 					}

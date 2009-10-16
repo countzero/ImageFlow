@@ -3,6 +3,17 @@
 /* ImageFlow Settings - CSS 2.1
 ==================================== */
 @media screen, projection {
+
+
+	.imageflow_iframes iframe{
+		border:none;
+		position:absolute;
+		visibility:hidden;
+		z-index:10004;
+		overflow:hidden;
+		margin:0;
+		padding:0;
+	}
 	.imageflow {
 		overflow:hidden;
 		position:relative; 
