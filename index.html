@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de">
+<head>
+<title>ImageFlow 0.4</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<meta name="language" content="de" />
+<meta name="description" content="ImageFlow ist eine Bildergallerie in Javascript, angelehnt an Apples CoverFlow."/>
+<meta name="keywords" content="ImageFlow, image flow, CoverFlow, cover flow, Javascript, imageflow in javascript, coverflow in javascript" />
+<meta name="robots" content="index, follow, noarchive" />
+<link rel="shortcut icon" href="favicon.ico" type="image/ico" />
+<link rel="stylesheet" title="Standard" href="screen.css" type="text/css" media="screen" />
+<script language="JavaScript" type="text/javascript" src="imageflow.js"></script>
+</head>
+<body>
+<div id="changelog">
+	<div>
+		<b>Download:</b> <a href="ImageFlow_0.4.rar">ImageFlow_0.4.rar</a> [17 KB]<br/>
+		<br/>
+		You are free to use this in any product, or on any web site. For more information about ImageFlow check my <a target="_top" href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog</a> and for anything else simply drop me a line in my <a href="http://shoutbox.finnrudolph.de/">Shoutbox</a>.<br/>
+		<br/>
+		<br/>
+		<b>ChangeLog</b><br/>
+		<br/>
+		Version 0.4
+		<ul>
+			<li>Added mouse wheel support</li>
+			<li>Added loading bar </li>
+			<li>Minor performance improvements</li>
+		</ul>
+		<p id="lnk" style="display:inline;"><a style="text-decoration:underline;" onclick="document.getElementById('log').style.display='block'; document.getElementById('lnk').style.display='none';" >Show full ChangeLog</a><br/><br/><br/></p>
+	</div>
+	<div style="text-align:left;display:none;padding-top:10px;" id="log">
+		Version 0.3
+		<ul>
+			<li>Added server side generated reflections</li>
+			<li>Minor performance improvements</li>
+			<li>Fixed correct scaling of square formats</li>
+		</ul>
+		<br/>
+		Version 0.2
+		<ul>
+			<li>Changed global scaling and positioning: now it scales in relation to the div container "images"</li>
+		</ul>
+		<br/>
+		Version 0.1
+		<ul>
+			<li>Improved browser compatibility</li>
+			<li>Added bottom alignment </li>
+			<li>Added correct scaling of different image formats</li>
+		</ul>
+		<br/>
+	</div>
+	<div>
+		<b>Donate</b><br/>
+		<br/>
+		If you like using ImageFlow and want to donate for my work - simply use moneybrookers.com:<br/>
+		<br/>
+	</div>
+	<a href="https://www.moneybookers.com/app/?rid=4434964"><img style="position:relative;" src="moneybrookers.png" alt="moneybrookers_logo" /></a><br/><br/>
+	<div>
+		Open your free <a href="https://www.moneybookers.com/app/?rid=4434964">moneybookers.com</a> account with your email address. Upload funds to your account via bank transfer, credit/debit card or cheque. And send the amount of your choice to my email account: finn.rudolph@googlemail.com
+	</div>
+</div>
+
+<div id="imageflow">
+	<h1>ImageFlow 0.4</h1>
+	<div id="loading">
+		<b>Loading images</b><br/>
+		<img src="loading.gif" width="208" height="13" alt="" />
+	</div>
+	<div id="images">
+		<img onclick="glideTo(0,'i1' )" src="reflect.php?img=img/img003.jpg" alt="" />
+		<img onclick="glideTo(-150,'i2' )" src="reflect.php?img=img/img005.jpg" alt="" />
+		<img onclick="glideTo(-300,'i3' )" src="reflect.php?img=img/img002.jpg" alt="" />
+		<img onclick="glideTo(-450,'i4' )" src="reflect.php?img=img/img003.jpg" alt="" />
+		<img onclick="glideTo(-600,'i5' )" src="reflect.php?img=img/img005.jpg" alt="" />
+		<img onclick="glideTo(-750,'i6' )" src="reflect.php?img=img/img006.jpg" alt="" />
+		<img onclick="glideTo(-900,'i7' )" src="reflect.php?img=img/img004.jpg" alt="" />
+		<img onclick="glideTo(-1050,'i8' )" src="reflect.php?img=img/img005.jpg" alt="" />
+		<img onclick="glideTo(-1200,'i9' )" src="reflect.php?img=img/img001.jpg" alt="" />
+		<img onclick="glideTo(-1350,'i10' )" src="reflect.php?img=img/img005.jpg" alt="" />
+	</div>
+	<div id="captions"></div>
+	<div class="none">
+		<div id="i1"><b>Image 1</b></div> 
+		<div id="i2"><b>Image 2</b></div> 
+		<div id="i3"><b>Image 3</b></div> 
+		<div id="i4"><b>Image 4</b></div> 
+		<div id="i5"><b>Image 5</b></div> 
+		<div id="i6"><b>Image 6</b></div> 
+		<div id="i7"><b>Image 7</b></div> 
+		<div id="i8"><b>Image 8</b></div> 
+		<div id="i9"><b>Image 9</b></div> 
+		<div id="i10"><b>Image 10</b></div> 
+	</div>
+</div>
+<div class="clear"></div>
+
+<!-- The following javascript is Google Analytics trackingcode and has nothing to do with ImageFlow -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1076251-6";
+urchinTracker();
+</script>
+</body>
+</html>

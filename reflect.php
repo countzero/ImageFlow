@@ -20,6 +20,9 @@
         cache           optional    Save reflection image to the cache? (boolean)
 	*/
 	
+	// CACHE! EVERYTHING! 
+	$_GET['cache'] = 1;
+
 	//	PHP Version sanity check
 	if (version_compare('4.3.2', phpversion()) == 1)
 	{
@@ -373,12 +376,14 @@
 			//	JPEG (the final parameter = the quality, 0 = terrible, 100 = pixel perfect)
 			header("Content-type: image/jpeg");
 			imagejpeg($output, '', $quality);
-			
-            // Save cached file
+
+			// Save cached file
             if ($cache)
             {
                 imagejpeg($output, $cache_path, $quality);
             }
+			
+           
 		}
 
 		imagedestroy($output);
