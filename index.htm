@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de">
+<head>
+<title>ImageFlow 0.1</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<meta name="author" content="Finn Rudolph, Kiel, Germany" />
+<meta name="description" content="Image Flow"/>
+<meta name="language" content="de" />
+<meta name="keywords" content="ImageFlow, Javascript" />
+<meta name="robots" content="index, follow, noarchive" />
+<style type="text/css">
+body {
+	background-color:#454545;
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	font-size:100.1%;
+	font: 83%/1.4 verdana, arial, helvetica, sans-serif;
+}
+img { 
+	position:absolute; 
+	top:0px; 
+}
+</style>
+<script language="JavaScript" type="text/javascript">
+<!--
+/* Set some variables */
+var current = 0;
+var target = 0;
+var timer = 0;
+var captionId = "i1";
+var captionTarget = "";
+
+/* Get width of the window in px */
+function windowWidth()
+{
+	var width=0;
+	if(document.layers) {
+		width = window.innerWidth;
+	} 
+	else {
+		width = document.body.clientWidth;
+	}
+	return width;
+}
+
+function step()
+{
+	if (target < current-1 || target > current+1)
+	{
+		moveTo(current + (target-current)/3);
+		window.setTimeout(step, 50);
+		timer = 1;
+	}
+	else
+	{
+		timer = 0;
+	}
+}
+
+function glideTo(x, newCaptionId)
+{
+	target = x;
+	if (timer == 0)
+	{
+		window.setTimeout(step, 50);
+		timer = 1;
+	}
+
+	captionId = newCaptionId;
+	var caption = document.getElementById(captionId);
+	captionTarget.innerHTML = caption.innerHTML;
+}
+
+
+function moveTo(x)
+{
+	current = x;
+
+	/* do stuff with the images div */
+	var div = document.getElementById("images");
+	var top = div.offsetTop;
+	var width = windowWidth();
+	var size = width * 0.5;
+	var biggest = width * 0.5;
+
+	/* zIndex is the z-index in css = order of the layers (here images) */
+	var zIndex = div.childNodes.length;
+
+	for (index = 0; index < div.childNodes.length; index++)
+	{
+		var image = div.childNodes.item(index);
+		if (image.nodeType == 1)
+		{
+			var z = Math.sqrt(10000 + x * x)+100;
+			var xs = x / z * size + size;
+
+			
+			/* Do not ask what this variable is for *GNA* */
+			var gna = 100 / z * biggest;
+
+			if((image.width - gna) > (image.height - gna))
+			{
+				image.style.left = xs - 67 / z * biggest + "px";
+				image.style.height = gna + "px";
+				image.style.width = "";
+			}
+			else
+			{
+				image.style.left = xs - 50 / z * biggest + "px";
+				image.style.width = gna + "px";
+				image.style.height = "";
+			}
+		
+			image.style.top = (width * 0.35 - image.height) + top + "px";
+			image.style.zIndex = zIndex;
+			if ( x < 0 )
+			{
+				zIndex++;
+			}
+			else
+			{
+				zIndex = zIndex -1;
+			}
+			x += 150;
+		}
+	}
+}
+
+/* Main Function */
+function refresh()
+{
+	var width = windowWidth();
+	var height = width * 0.35;
+	var images = document.getElementById("images");
+	images.style.height = height + "px";
+
+	/* Text on top through zIndex */
+	captionTarget = document.getElementById("captionTarget");
+	captionTarget.style.top = images.offsetTop + height + "px";
+	captionTarget.style.zIndex = 100;
+
+	var caption = document.getElementById(captionId);
+	captionTarget.innerHTML = caption.innerHTML;
+
+	/* Call subFunction */
+	moveTo(current);
+}
+//-->
+</script> 
+</head>
+<body onload="refresh()">
+<div style="width:100%;">
+
+	<h1>ImageFlow 0.1</h1><br/>
+	<div id="images">
+		<img onclick="glideTo( 0, 'i1')" src="img/DSC00799.jpg" alt="" />
+		<img onclick="glideTo( -150, 'i2')" src="img/DSC00862.jpg" alt="" />
+		<img onclick="glideTo( -300, 'i3')" src="img/IMG_2362.jpg" alt="" />
+		<img onclick="glideTo( -450, 'i4')" src="img/IMG_4645.jpg" alt="" />
+		<img onclick="glideTo( -600, 'i5')" src="img/IMG_4654.jpg" alt="" />
+		<img onclick="glideTo( -750, 'i6')" src="img/IMG_4654.jpg" alt="" />
+		<img onclick="glideTo( -900, 'i7')" src="img/IMG_2362.jpg" alt="" />
+		<img onclick="glideTo( -1050, 'i8')" src="img/IMG_4645.jpg" alt="" />
+		<img onclick="glideTo( -1200, 'i9')" src="img/IMG_4654.jpg" alt="" />
+		<img onclick="glideTo( -1350, 'i10')" src="img/IMG_4654.jpg" alt="" />
+	</div>
+
+	<div id="captionTarget" style="padding-top:20px;text-align:center;"></div>
+
+	<div style="display:none;">
+		<div id="i1"><b>Image 1</b><br/>Yuenniiiii</div>
+		<div id="i2"><b>Image 2</b><br/>Frau Mallach macht Tüdelkram...</div>
+		<div id="i3"><b>Image 3</b><br/></div>
+		<div id="i4"><b>Image 4</b><br/></div>
+		<div id="i5"><b>Image 5</b><br/></div>
+		<div id="i6"><b>Image 6</b><br/></div>
+		<div id="i7"><b>Image 7</b><br/></div>
+		<div id="i8"><b>Image 8</b><br/></div>
+		<div id="i9"><b>Image 9</b><br/></div>
+		<div id="i10"><b>Image 10</b><br/></div>
+	</div>
+
+</div>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+window.onresize = function() { refresh(); }
+refresh();
+//-->
+</script> 
+
+</body>
+</html>
