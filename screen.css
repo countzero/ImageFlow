@@ -40,10 +40,25 @@ a{
 	position:relative; 
 }
 #captions{
-	position:absolute;
-	margin-top:50px;
+	position:relative; 
 	text-align:center;
 	z-index:10000;
+}
+#scrollbar{
+	visibility:hidden;
+	position:relative; 
+	border-bottom:1px solid #b3b3b3;
+	z-index:10001;
+}
+#scrollbar_slider{
+	position:absolute;
+	margin-top:-7px;
+	margin-left:-7px;
+	z-index:10002;
+	background-image:url(slider.png);
+	background-repeat:no-repeat;
+	width:14px;
+	height:14px;	
 }
 #imageflow{
 	margin-left:350px;

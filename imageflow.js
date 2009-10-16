@@ -1,10 +1,10 @@
 /**
- *	ImageFlow 0.4
+ *	ImageFlow 0.5
  *
  *	This code is based on Michael L. Perrys Cover flow in Javascript.
  *	For he wrote that "You can take this code and use it as your own" [1]
  *	this is my attempt to improve some things. Feel free to use it! If
- *	you have any questions on it leave a message in my shoutbox [2].
+ *	you have any questions on it leave me a message in my shoutbox [2].
  *
  *	The reflection is generated server-sided by a slightly hacked  
  *	version of Richard Daveys easyreflections [3] written in PHP.
@@ -25,11 +25,24 @@ var caption_id = "i1";
 var new_caption_id = "";
 var current = 0;
 var target = 0;
+var mem_target = 0;
 var timer = 0;
 var array_images = new Array();
+var new_slider_pos = 0;
+var dragging=false;
+var dragobject = null;
+var dragx = 0;
+var posx = 0;
+var new_posx = 0;
 
 /* This variable must be changed to the used reflection image height in % of the source image */
 var reflection_p = 0.5;
+
+/* This variable sets the focus: max number of images displayed on each side of the current one */
+var focus = 4;
+
+/* This variable must be set to the width of the slider div in px */
+var slider_width = 14;
 
 function step()
 {
@@ -51,6 +64,7 @@ function glideTo(x, new_caption_id)
 {	
 	/* Animate gliding to new x position */
 	target = x;
+	mem_target = x;
 	if (timer == 0)
 	{
 		window.setTimeout(step, 50);
@@ -61,6 +75,13 @@ function glideTo(x, new_caption_id)
 	caption_id = new_caption_id;
 	caption = document.getElementById(caption_id)
 	if (caption) caption_div.innerHTML = caption.innerHTML;
+
+	/* Set scrollbar slider to new position */
+	if (dragging == false)
+	{
+		new_slider_pos = (scrollbar_width * (-(x*100/((max-1)*150))) / 100) - new_posx;
+		slider_div.style.marginLeft = (new_slider_pos - slider_width) + "px";
+	}
 }
 
 function moveTo(x)
@@ -68,54 +89,68 @@ function moveTo(x)
 	current = x;
 	var zIndex = max;
 	
-	/* Loop */
+	/* Main loop */
 	for (var index = 0; index < max; index++)
 	{ 
 		var image = img_div.childNodes.item(array_images[index]);
-		var z = Math.sqrt(10000 + x * x)+100;
-		var xs = x / z * size + size;
-		
-		/* Get current image properties */
-		var img_h = image.height;
-		var img_w = image.width;
-		
-		/* Check source image format. Get image height minus reflection height! */
-		switch ((img_w + 1) > (img_h / (reflection_p + 1))) 
+		var current_image = index * -150;
+
+		/* Don't display images that are not focussed */
+		if ((current_image+focus) < mem_target || (current_image-focus) > mem_target)
 		{
-			/* Landscape format */
-			case true:
-				var img_percent = 118;
-				break;
-
-			/* Portrait and square format */
-			default:
-				var img_percent = 100;
-				break;
+			image.style.visibility="hidden";
+			image.style.display="none";
 		}
-		
-		/* Process new image height and top spacing */
-		var new_img_h = (img_h / img_w * img_percent) / z * size;
-		var new_img_top = (images_width * 0.33 - new_img_h) + images_top + ((new_img_h / (reflection_p + 1)) * reflection_p);
-
-		/* Set new image properties */
-		image.style.left = xs - (img_percent / 2) / z * size + imageflow_left + "px";
-		image.style.height = new_img_h + "px";
-		image.style.width= "";
-		image.style.top = new_img_top + "px";
-
-		/* Set image layer through zIndex */
-		switch ( x < 0) 
+		else 
 		{
-			case true:
-				zIndex++;
-				break;
+			var z = Math.sqrt(10000 + x * x) + 100;
+			var xs = x / z * size + size;
 
-			default:
-				zIndex = zIndex -1;
-				break;
+			/* Still hide images until they are processed, but set display style to block */
+			image.style.display="block";
+
+			/* Get current image properties */
+			var img_h = image.height;
+			var img_w = image.width;
+			
+			/* Check source image format. Get image height minus reflection height! */
+			switch ((img_w + 1) > (img_h / (reflection_p + 1))) 
+			{
+				/* Landscape format */
+				case true:
+					var img_percent = 118;
+					break;
+
+				/* Portrait and square format */
+				default:
+					var img_percent = 100;
+					break;
+			}
+			
+			/* Process new image height and top spacing */
+			var new_img_h = (img_h / img_w * img_percent) / z * size;
+			var new_img_top = (images_width * 0.33 - new_img_h) + images_top + ((new_img_h / (reflection_p + 1)) * reflection_p);
+		
+			/* Set new image properties */
+			image.style.left = xs - (img_percent / 2) / z * size + imageflow_left + "px";
+			image.style.height = new_img_h + "px";
+			image.style.width= "";
+			image.style.top = new_img_top + "px";
+		 	image.style.visibility="visible";
+
+			/* Set image layer through zIndex */
+			switch ( x < 0) 
+			{
+				case true:
+					zIndex++;
+					break;
+
+				default:
+					zIndex = zIndex -1;
+					break;
+			}
+			image.style.zIndex = zIndex;
 		}
-		image.style.zIndex = zIndex;
-
 		x += 150;
 	}
 }
@@ -126,17 +161,26 @@ function refresh()
 	/* Cache document objects in global script variables */
 	img_div = document.getElementById("images");
 	caption_div = document.getElementById("captions");
-	
+	scrollbar_div = document.getElementById("scrollbar");
+	slider_div = document.getElementById("scrollbar_slider");
+
 	/* Change images div properties */
 	images_width = img_div.offsetWidth;
 	var images_height = images_width * 0.33;
 	img_div.style.height = images_height + "px";
 
 	/* Change captions div properties */
-	caption_div.style.top = img_div.offsetTop + images_height + "px";
 	caption_div.style.width = images_width + "px";
+	caption_div.style.marginTop = images_width * 0.03 + "px";
 	caption_div.innerHTML = document.getElementById(caption_id).innerHTML;
-	
+
+	/* Change scrollbar div properties */
+	slider_width = slider_width * 0.5;
+	scrollbar_width = images_width * 0.6;
+	scrollbar_div.style.marginTop = images_width * 0.02 + "px";
+	scrollbar_div.style.marginLeft = images_width * 0.2 + "px";
+	scrollbar_div.style.width = scrollbar_width + "px";
+
 	/* Cache global variables, that only change on refresh */
 	imageflow_left = document.getElementById("imageflow").offsetLeft;
 	images_top = img_div.offsetTop;
@@ -155,12 +199,17 @@ function refresh()
 		}
 	}
 	max = array_images.length;
+	
+	/* This variable sets the focus: max number of images displayed on each side of the current one */
+	focus = 4;
+	focus = focus * 150;
 
 	/* Display images in current order */
 	moveTo(current);
+	glideTo(current, caption_id);
 }
 
-/* Show/hide functions */
+/* Show/hide element functions */
 function show(id) {
 	var element = document.getElementById(id);
 	element.style.visibility = "visible";
@@ -170,59 +219,115 @@ function hide(id) {
 	element.style.visibility = "hidden";
 }
 
-/* Hide loading div and show the images div */
+/* Hide loading bar, show content and initialize mouse event listening after loading */
 window.onload = function() {
 	hide('loading');
-	show('images');
 	refresh();
+	show('images');
+	show('scrollbar');
+	initMouseWheel();
+	initMouseDrag();
 }
 
+/* Refresh ImageFlow on window resize */
 window.onresize = refresh;
 
-/* JavaScript mouse wheel support */
-function handle(delta) {
-
+/* Handle the wheel angle change (delta) of the mouse wheel */
+function handle(delta) 
+{
+	/* Extract the integer from the caption_id */
 	var caption_id_int = caption_id.substr(1);
 	caption_id_int = parseInt(caption_id_int);
 
 	switch (delta > 0) 
 	{
-	case true:
-		if(target != 0)
-		{
-			target = target + 150;
-			new_caption_id = 'i' + (caption_id_int - 1);
-		}
-		break;
-
-	default:
-		if(caption_id_int < max)
-		{
-			target = target - 150;
-			new_caption_id = 'i' + (caption_id_int + 1);
+		case true:
+			if(caption_id_int != 1)
+			{
+				target = target + 150;
+				new_caption_id = 'i' + (caption_id_int - 1);
+			}
 			break;
-		}
+
+		default:
+			if(caption_id_int < max)
+			{
+				target = target - 150;
+				new_caption_id = 'i' + (caption_id_int + 1);
+			}
+			break;
 	}
+
+	/* Glide to next (mouse wheel down) / previous (mouse wheel up) image */
 	glideTo(target, new_caption_id);
 }
 
-/* JavaScript mouse wheel support */
-function wheel(event){
+/* Event handler for mouse wheel event */
+function wheel(event)
+{
 	var delta = 0;
 	if (!event) event = window.event;
-	if (event.wheelDelta) {
+	if (event.wheelDelta) 
+	{
 		delta = event.wheelDelta/120; 
-	} else if (event.detail) {
+	} 
+	else if (event.detail) 
+	{
 		delta = -event.detail/3;
 	}
-	if (delta)
-		handle(delta);
-        if (event.preventDefault)
-                event.preventDefault();
-        event.returnValue = false;
+	if (delta) handle(delta);
+	if (event.preventDefault) event.preventDefault();
+	event.returnValue = false;
 }
 
-/* Initialization code */
-if (window.addEventListener)
-	window.addEventListener('DOMMouseScroll', wheel, false);
-window.onmousewheel = document.onmousewheel = wheel;
+/* Initialize mouse wheel event listener */
+function initMouseWheel()
+{
+	if(window.addEventListener) window.addEventListener('DOMMouseScroll', wheel, false);
+	window.onmousewheel = document.onmousewheel = wheel;
+}
+
+/* This function is called to drag an object (= slider div) */
+function dragstart(element) 
+{
+	dragobject = element;
+	dragx = posx - dragobject.offsetLeft + new_slider_pos;
+}
+
+/* This function is called to stop dragging an object */
+function dragstop() 
+{
+	dragobject = null;
+	dragging = false;
+}
+
+/* This function is called on mouse movement and moves an object (= slider div) on user action */
+function drag(e)
+{
+	posx = document.all ? window.event.clientX : e.pageX;
+	if(dragobject != null) 
+	{
+		dragging = true;
+		new_posx = (posx - dragx) + slider_width;
+
+		/* Make sure, that the slider is moved in proper relation to previous movements by the glideTo function */
+		if(new_posx < ( - new_slider_pos)) new_posx = - new_slider_pos;
+		if(new_posx > (scrollbar_width - new_slider_pos)) new_posx = scrollbar_width - new_slider_pos;
+		
+		var slider_pos = (new_posx + new_slider_pos);
+		var step_width = slider_pos / ((scrollbar_width) / (max-1));
+		var image_number = Math.round(step_width);
+		var new_target = (image_number) * -150;
+		var new_caption_id = 'i' + (image_number+1);
+
+		dragobject.style.left = new_posx + "px";
+		glideTo(new_target, new_caption_id);
+	}
+}
+
+/* Initialize mouse event listener */
+function initMouseDrag() 
+{
+	document.onmousemove = drag;
+	document.onmouseup = dragstop;
+}
