@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
-<title>ImageFlow 0.2</title>
+<title>ImageFlow 0.3</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
 <meta name="language" content="de" />
 <meta name="description" content="ImageFlow ist eine Bildergallerie in Javascript, angelehnt an Apples CoverFlow."/>
@@ -11,11 +11,11 @@
 <link rel="shortcut icon" href="favicon.ico" type="image/ico" />
 <style type="text/css">
 body {
-	background-color:#454545;
+	background-color:#000;
+	text-align:center;
 	color: #fff;
 	margin: 0;
 	padding: 0;
-	text-align: center;
 	font-size:100.1%;
 	font: 83%/1.4 verdana, arial, helvetica, sans-serif;
 }
@@ -23,30 +23,71 @@ img {
 	position:absolute; 
 	top:0px; 
 }
+h1 {
+	text-align:center;
+}
+a{
+	color:#fff;
+}
+#captionTarget{
+	position:absolute;
+	margin-top:50px;
+	text-align:center;
+}
+#imageflow{
+	margin-left:350px;
+	text-align:left;
+}
+#changelog{
+	width:349px;
+	border-right:solid 1px #666;
+	float:left;
+	margin-top:15px
+}
+#changelog div{
+	padding:15px;
+	text-align:left;
+}
 </style>
 <script language="JavaScript" type="text/javascript">
 <!--
 /*
- *	ImageFlow 0.2
+ *	ImageFlow 0.3
  *
  *	This code is based on Michael L. Perrys Cover flow in Javascript.
  *	For he wrote that "You can take this code and use it as your own" [1]
  *	this is my attempt to improve some things. Feel free to use it! If
  *	you have any questions on it leave a message in my shoutbox [2].
  *
+ *	The reflection is generated server-sided by a slightly hacked  
+ *	version of Richard Daveys easyreflections [3] written in PHP.
+ *
+ *
  *	[1] http://www.adventuresinsoftware.com/blog/?p=104#comment-1981
  *	[2] http://shoutbox.finnrudolph.de/
+ *	[3] http://reflection.corephp.co.uk/v2.php
  *	
  */
 
-/* Set some variables */
+/* Define some variables */
 var current = 0;
 var target = 0;
 var timer = 0;
 var captionId = "i1";
 var captionTarget = "";
+var img_h = 0;
+var img_w = 0;
+var img_percent = 0;
+var z = 0;
+var xs = 0;
+var image = 0;
+var new_img_h = 0;
+var new_img_top = 0;
 
-/* Get width of the images div container in px */
+/* This variable must be changed to the used reflection image height in % of the source image */
+var reflection_p = 0.5;
+
+/* Get width of the images div container */
 function windowWidth()
 {
 	var width = document.getElementById("images").offsetWidth;
@@ -92,39 +133,46 @@ function moveTo(x)
 	var top = div.offsetTop;
 	var width = windowWidth();
 	var size = width * 0.5;
-	var biggest = width * 0.5;
-
-	/* zIndex is the z-index in css = order of the layers (here images) */
-	var zIndex = div.childNodes.length;
 	var max = div.childNodes.length;
+	var zIndex = max;
 
 	for (index = 0; index < max; index++)
 	{
-		var image = div.childNodes.item(index);
+		image = div.childNodes.item(index);
 		if (image.nodeType == 1)
 		{
-			var z = Math.sqrt(10000 + x * x)+100;
-			var xs = x / z * size + size;
-
+			z = Math.sqrt(10000 + x * x)+100;
+			xs = x / z * size + size;
 			
-			/* Do not ask what this variable is for *GNA* */
-			var gna = 100 / z * biggest;
+			/* Get current image properties */
+			img_h = image.height;
+			img_w = image.width;
+			
+			/* Check source image format. Get image height minus reflection height! */
+			switch ((img_w + 1) > (img_h / (reflection_p + 1))) 
+			{
+				/* Landscape format */
+				case true:
+					img_percent = 118;
+					break;
 
-			if((image.width) > (image.height))
-			{
-				image.style.left = xs - 67 / z * biggest + padding_left +"px";
-				image.style.height = gna + "px";
-				image.style.width = "";
+				/* Portrait and square format */
+				default:
+					img_percent = 100;
+					break;
 			}
-			else
-			{
-				image.style.left = xs - 50 / z * biggest + padding_left + "px";
-				image.style.width = gna + "px";
-				image.style.height = "";
-			}
-		
-			image.style.top = (width * 0.35 - image.height) + top + "px";
+			
+			/* Process new image height and top spacing */
+			new_img_h = (img_h / img_w * img_percent) / z * size;
+			new_img_top = (width * 0.35 - new_img_h) + top + ((new_img_h / (reflection_p + 1)) * reflection_p);
+
+			/* Set new image properties */
+			image.style.left = xs - (img_percent / 2) / z * size + padding_left + "px";
+			image.style.height = new_img_h + "px";
+			image.style.width= "";
+			image.style.top = new_img_top + "px";
 			image.style.zIndex = zIndex;
+
 			if ( x < 0 )
 			{
 				zIndex++;
@@ -149,11 +197,11 @@ function refresh()
 	/* Text on top through zIndex */
 	captionTarget = document.getElementById("captionTarget");
 	captionTarget.style.top = images.offsetTop + height + "px";
-	captionTarget.style.zIndex = 100;
-
+	captionTarget.style.width = width + "px";
+	captionTarget.style.zIndex = 10000;
 	var caption = document.getElementById(captionId);
 	captionTarget.innerHTML = caption.innerHTML;
-
+	
 	/* Call subFunction */
 	moveTo(current);
 }
@@ -163,45 +211,51 @@ function refresh()
 <body onload="refresh();">
 <div style="width:100%">
 
-<div style="width:30%;float:left;margin-top:15px">
-	<div style="border-right:solid 1px #666;">
-		<b>ChangeLog</b><br/>
-		<div style="padding:15px;text-align:left;">
-			Version 0.2
-			<ul>
-				<li>Changed global scaling and positioning: now it scales in relation to the div container "images"</li>
-			</ul>
-			<br/>
-			Version 0.1
-			<ul>
-				<li>Improved browser compatibility</li>
-				<li>Added bottom alignment </li>
-				<li>Added correct scaling of different image formats</li>
-			</ul>
-			<br/>
-			<br/>
-			For more information on ImageFlow check my <a target="_top" style="color:#fff;" href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog on Dragonfly</a>.<br/>
-		</div>
+<div id="changelog">
+	<b>ChangeLog</b><br/>
+	<div>
+		Version 0.3
+		<ul>
+			<li>Added server side generated reflections</li>
+			<li>Minor performance improvements</li>
+			<li>Fixed correct scaling of square formats</li>
+		</ul>
+		<br/>
+		Version 0.2
+		<ul>
+			<li>Changed global scaling and positioning: now it scales in relation to the div container "images"</li>
+		</ul>
+		<br/>
+		Version 0.1
+		<ul>
+			<li>Improved browser compatibility</li>
+			<li>Added bottom alignment </li>
+			<li>Added correct scaling of different image formats</li>
+		</ul>
+		<br/>
+		<b>Download:</b> <a href="ImageFlow_v0.3.rar">ImageFlow_v0.3.rar</a> [10 KB]<br/> 
+		<br/><br/>
+		You are free to use this in any product, or on any web site. For more information on ImageFlow check my <a target="_top" href="http://194.95.111.244/~countzero/myCMS/index.php?c_id=1&amp;s_id=4&amp;tag=ImageFlow">Newsblog</a>. For anything else simply drop a line in my <a href="http://shoutbox.finnrudolph.de/">Shoutbox</a>.<br/>
 	</div>
 </div>
 
-<div id="imageflow" style="width:70%;float:right;">
-
-	<h1>ImageFlow 0.2</h1><br/>
+<div id="imageflow">
+	<h1>ImageFlow 0.3</h1><br/>
 	<div id="images">
-		<img onclick="glideTo( 0, 'i1')" src="img/DSC00799.jpg" alt="" />
-		<img onclick="glideTo( -150, 'i2')" src="img/DSC00862.jpg" alt="" />
-		<img onclick="glideTo( -300, 'i3')" src="img/IMG_2362.jpg" alt="" />
-		<img onclick="glideTo( -450, 'i4')" src="img/IMG_4645.jpg" alt="" />
-		<img onclick="glideTo( -600, 'i5')" src="img/IMG_4654.jpg" alt="" />
-		<img onclick="glideTo( -750, 'i6')" src="img/IMG_4654.jpg" alt="" />
-		<img onclick="glideTo( -900, 'i7')" src="img/IMG_2362.jpg" alt="" />
-		<img onclick="glideTo( -1050, 'i8')" src="img/IMG_4645.jpg" alt="" />
-		<img onclick="glideTo( -1200, 'i9')" src="img/IMG_4654.jpg" alt="" />
-		<img onclick="glideTo( -1350, 'i10')" src="img/IMG_4654.jpg" alt="" />
+		<img onclick="glideTo(    0,  'i1' )" src="reflect.php?img=img/img001.jpg" alt="" />
+		<img onclick="glideTo( -150,  'i2' )" src="reflect.php?img=img/img002.jpg" alt="" />
+		<img onclick="glideTo( -300,  'i3' )" src="reflect.php?img=img/img003.jpg" alt="" />
+		<img onclick="glideTo( -450,  'i4' )" src="reflect.php?img=img/img004.jpg" alt="" />
+		<img onclick="glideTo( -600,  'i5' )" src="reflect.php?img=img/img005.jpg" alt="" />
+		<img onclick="glideTo( -750,  'i6' )" src="reflect.php?img=img/img006.jpg" alt="" />
+		<img onclick="glideTo( -900,  'i7' )" src="reflect.php?img=img/img002.jpg" alt="" />
+		<img onclick="glideTo( -1050, 'i8' )" src="reflect.php?img=img/img004.jpg" alt="" />
+		<img onclick="glideTo( -1200, 'i9' )" src="reflect.php?img=img/img005.jpg" alt="" />
+		<img onclick="glideTo( -1350, 'i10')" src="reflect.php?img=img/img004.jpg" alt="" />
+
 	</div>
 
-	<div id="captionTarget" style="padding-top:20px;text-align:center;"></div>
+	<div id="captionTarget"></div>
 
 	<div style="display:none;">
 		<div id="i1"><b>Image 1</b></div>

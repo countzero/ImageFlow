@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
-<title>ImageFlow 0.2 in iframes</title>
+<title>ImageFlow 0.3 in iframes</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
 <meta name="language" content="de" />
 <meta name="description" content="ImageFlow ist eine Bildergallerie in Javascript, angelehnt an Apples CoverFlow."/>
@@ -11,7 +11,7 @@
 <link rel="shortcut icon" href="favicon.ico" type="image/ico" />
 <style type="text/css">
 body {
-	background-color:#454545;
+	background-color:#000;
 	color: #fff;
 	margin: 0;
 	padding: 0;
@@ -23,10 +23,13 @@ img {
 	position:absolute; 
 	top:0px; 
 }
+iframe {
+	border:0;
+}
 </style>
 </head>
 <body>
-<iframe src="index.htm" width="1000" height="400" name="iframe_1"></iframe>
-<iframe src="index.htm" width="1000" height="400" name="iframe_2"></iframe>
+<iframe style="border-bottom:1px solid #fff;" src="index.htm" width="1000" height="500" name="iframe_1"></iframe>
+<iframe src="index.htm" width="1000" height="500" name="iframe_2"></iframe>
 </body>
 </html>
