@@ -525,17 +525,16 @@ function ImageFlow ()
 							/* Display iFrame and scale it like the image */
 							if(image.iframeId)
 							{
-								
 								var iframe = document.getElementById(image.iframeId);
-								
+								iframe.style.visibility = 'visible';
 								iframe.style.left = image.offsetLeft + 'px';
 								if(newImageW && newImageH)
 								{
-									iframe.style.height = image.height + 'px';
+									iframe.style.height = (image.getAttribute('height') / image.w * image.pc) / z * thisObject.size + 'px';
 									iframe.style.width = image.width + 'px';
 									iframe.style.top = image.offsetTop + thisObject.ImageFlowDiv.offsetTop + 'px';
 								}
-								iframe.style.visibility = 'visible';
+								
 					
 							}
 							break;
