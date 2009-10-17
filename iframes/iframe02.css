@@ -4,28 +4,34 @@
    It has nothing to do with ImageFlow
 ========================================== */
 @media screen, projection, print {
-	* { 
-		font-family:verdana, arial, helvetica, sans-serif;
-		font-size:100.01%;
+	* {
+		font-family: georgia, 'bitstream vera serif', serif; 
+		font-weight: normal; 
+		font-size: 100.01%;
+		margin: 0; 
+		padding: 0; 
 	}
 	html {
-		height:100%;
-		width:100%;
+		font-size:1.0em;
+		line-height: 1.5;
+		height: 100%;
 	}
 	body {
 		color:#fff;
-		background-color:#f00;
-		font-size:0.8em;
-		line-height:1.4em;
-		padding:1em 0;
+		background-color:#fff;
+		padding:0;
 		margin:0;
+		background:url(iframe02.jpg);
+	}
+	b {
+		font-weight:bold;
 	}
 	a {
 		color:#fff;
 	}
-	h1 {
-		font-size:2.2em;
-		text-align:center;
-		margin:0.4em 0 1.3em 0;
+	p {
+		padding:1em;
+		margin:1em;
+		background:url(iframe02.png);
 	}
 }
