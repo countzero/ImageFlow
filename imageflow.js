@@ -1,6 +1,6 @@
 /*
 Name:       ImageFlow - (Marriot International)
-Version:    1.2.2 (Oktober 16 2009)
+Version:    1.2.2 (Oktober 17 2009)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
