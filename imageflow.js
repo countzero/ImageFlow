@@ -1,5 +1,5 @@
 /*
-Name:       ImageFlow - (Marriot International)
+Name:       ImageFlow - (Marriott International)
 Version:    1.2.2 (Oktober 17 2009)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
@@ -521,21 +521,19 @@ function ImageFlow ()
 							{
 								image.onclick = thisObject.onClick;
 							}
-							
+
 							/* Display iFrame and scale it like the image */
 							if(image.iframeId)
 							{
 								var iframe = document.getElementById(image.iframeId);
 								iframe.style.visibility = 'visible';
-								iframe.style.left = image.offsetLeft + 'px';
+								iframe.style.left = image.offsetLeft -1 + 'px';
 								if(newImageW && newImageH)
 								{
-									iframe.style.height = (image.getAttribute('height') / image.w * image.pc) / z * thisObject.size + 'px';
-									iframe.style.width = image.width + 'px';
-									iframe.style.top = image.offsetTop + thisObject.ImageFlowDiv.offsetTop + 'px';
+									iframe.style.height = ((image.getAttribute('height') / image.w * image.pc) / z * thisObject.size) + 2 + 'px';
+									iframe.style.width = newImageW + 2 + 'px';
+									iframe.style.top = image.offsetTop + thisObject.ImageFlowDiv.offsetTop - 1 + 'px';
 								}
-								
-					
 							}
 							break;
 					}
