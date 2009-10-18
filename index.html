@@ -1,44 +1,55 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>ImageFlow</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
-<link rel="stylesheet" href="style.css" type="text/css" />
+	<head>
+		<title>ImageFlow</title>
+		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+		<link rel="stylesheet" href="style.css" type="text/css" />
 
-<!-- This includes the ImageFlow CSS and JavaScript -->
-<link rel="stylesheet" href="imageflow.css" type="text/css" />
-<script type="text/javascript" src="imageflow.js"></script>
+		<!-- This includes the Highslide CSS and JavaScript -->
+		<script type="text/javascript" src="highslide/highslide-with-html.packed.js"></script>
+		<script type="text/javascript" src="highslide/highslide.config.js" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="highslide/highslide.css" />
+		<!--[if lt IE 7]>
+			<link rel="stylesheet" type="text/css" href="highslide/highslide-ie6.css" />
+		<![endif]-->
 
-</head>
-<body>
-<h1>ImageFlow</h1>
-<br/><br/><br/><br/>
+		<!-- This includes the ImageFlow CSS and JavaScript -->
+		<link rel="stylesheet" href="imageflow.css" type="text/css" />
+		<script type="text/javascript" src="imageflow.js"></script>
 
-<!-- This is all the XHTML ImageFlow needs -->
-<div id="myImageFlow" class="imageflow">
-	<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 1" />
-	<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 2" />
-	<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 3" />
-	<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 4" />
-	<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 5" />
-	<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="simple text" class="iframe01" />
-	<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="image and link" class="iframe02" />
-	<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="javascript (&lt;a href=&quot;http://processingjs.org/&quot;&gt;Processing.js&lt;/a&gt;)" class="iframe03" />
-	<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 9" />
-	<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 10" />
-	<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 11" />
-	<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 12" />
-	<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 13" />
-	<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 14" />
-	<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 15" />
-</div>
+	</head>
+	<body>
+		<h1>ImageFlow</h1>
 
-<div class="imageflow_iframes">
-	<iframe scrolling="no" frameborder="0" src="iframes/iframe01.htm" name="simple_text" id="iframe01" >asd</iframe>
-	<iframe scrolling="no" frameborder="0" src="iframes/iframe02.htm" name="image_and_link" id="iframe02" >asd</iframe>
-	<iframe scrolling="no" frameborder="0" src="iframes/iframe03.htm" name="javascript" id="iframe03" >asd</iframe>
-</div>
+		<!-- This is all the XHTML ImageFlow needs -->
+		<div id="myImageFlow" class="imageflow">
+			<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 1" />
+			<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 2" />
+			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 3" />
+			<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 4" />
+			<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 5" />
+			<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="simple text" class="iframe01" />
+			<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="image and link" class="iframe02" />
+			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="javascript (&lt;a href=&quot;http://processingjs.org/&quot;&gt;Processing.js&lt;/a&gt;)" class="iframe03" />
+			<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 9" />
+			<img src="img/img1.png" longdesc="img/img1.png" width="400" height="300" alt="Image 10" />
+			<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 11" />
+			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 12" />
+			<img src="img/img2.png" longdesc="img/img2.png" width="300" height="400" alt="Image 13" />
+			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 14" />
+			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 15" />
+		</div>
 
-</body>
+		<div class="imageflow_iframes">
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe01.htm" name="simple_text" id="iframe01" >asd</iframe>
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe02.htm" name="image_and_link" id="iframe02" >asd</iframe>
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe03.htm" name="javascript" id="iframe03" >asd</iframe>
+		</div>
+
+		<a href="iframes/iframe01.htm" onclick="return hs.htmlExpand(this, { 
+					objectType: 'iframe', width: 400, 
+					headingText: 'Title from onclick', wrapperClassName: 'titlebar' } )">Iframe</a>
+
+	</body>
 </html>

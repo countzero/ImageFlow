@@ -103,6 +103,7 @@ function ImageFlow ()
 				this.sliderDiv = document.getElementById(thisObject.ImageFlowID+'_slider');
 				this.buttonNextDiv = document.getElementById(thisObject.ImageFlowID+'_next');
 				this.buttonPreviousDiv = document.getElementById(thisObject.ImageFlowID+'_previous');
+				this.iframeExpandDiv = document.getElementById(thisObject.ImageFlowID+'_iframe_expand');
 
 				this.indexArray = [];
 				this.current = 0;
@@ -194,13 +195,17 @@ function ImageFlow ()
 		var navigationDiv = thisObject.Helper.createDocumentElement('div','navigation');
 		navigationDiv.appendChild(captionDiv);
 		navigationDiv.appendChild(scrollbarDiv);
+		
+		/* Create iframe expand container */
+		var iframeExpandDiv = thisObject.Helper.createDocumentElement('div','iframe_expand');
 	
 		/* Update document structure and return true on success */
 		var success = false;
 		if (thisObject.ImageFlowDiv.appendChild(imagesDiv) &&
 			thisObject.ImageFlowDiv.appendChild(loadingP) &&
 			thisObject.ImageFlowDiv.appendChild(loadingDiv) &&
-			thisObject.ImageFlowDiv.appendChild(navigationDiv))
+			thisObject.ImageFlowDiv.appendChild(navigationDiv) &&
+			thisObject.ImageFlowDiv.appendChild(iframeExpandDiv))
 		{
 			/* Remove image nodes outside the images div */
 			for(index = 0; index < max; index++)
@@ -526,7 +531,6 @@ function ImageFlow ()
 							if(image.iframeId)
 							{
 								var iframe = document.getElementById(image.iframeId);
-								iframe.style.visibility = 'visible';
 								iframe.style.left = image.offsetLeft -1 + 'px';
 								if(newImageW && newImageH)
 								{
@@ -534,6 +538,22 @@ function ImageFlow ()
 									iframe.style.width = newImageW + 2 + 'px';
 									iframe.style.top = image.offsetTop + thisObject.ImageFlowDiv.offsetTop - 1 + 'px';
 								}
+								iframe.style.visibility = 'visible';
+								thisObject.iframeExpandDiv.style.visibility = 'visible';
+								thisObject.iframeExpandDiv.style.left = image.offsetLeft + newImageW + 1 + 'px';
+								thisObject.iframeExpandDiv.style.top = image.offsetTop - 1 + 'px';
+								thisObject.iframeExpandDiv.onclick = function() 
+																	{ 
+																		hs.htmlExpand(this, { 
+																			objectType: 'iframe', 
+																			width: 400, 
+																			headingText: 'Title from onclick', 
+																			wrapperClassName: 'titlebar' } );
+																	};
+								
+							}
+							else{
+								thisObject.iframeExpandDiv.style.visibility = 'hidden';
 							}
 							break;
 					}
