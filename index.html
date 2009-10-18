@@ -41,15 +41,33 @@
 			<img src="img/img3.png" longdesc="img/img3.png" width="400" height="400" alt="Image 15" />
 		</div>
 
-		<div class="imageflow_iframes">
-			<iframe scrolling="no" frameborder="0" src="iframes/iframe01.htm" name="simple_text" id="iframe01" >asd</iframe>
-			<iframe scrolling="no" frameborder="0" src="iframes/iframe02.htm" name="image_and_link" id="iframe02" >asd</iframe>
-			<iframe scrolling="no" frameborder="0" src="iframes/iframe03.htm" name="javascript" id="iframe03" >asd</iframe>
+		<!-- Iframes displayed in ImageFlow and the Highslide expand links -->
+		<div id="iframe01" class="imageflow_iframe">
+			<a href="iframes/iframe01/index.html" onclick="return hs.htmlExpand(this, { 
+				width: 400, 
+				height: 320, 
+				headingText: 'Simple Text',
+				objectType: 'iframe'} )"><img src="expand.png"  width="30" height="30" alt="expand" /></a>
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe01/index.html" name="simple_text" ></iframe>
 		</div>
 
-		<a href="iframes/iframe01.htm" onclick="return hs.htmlExpand(this, { 
-					objectType: 'iframe', width: 400, 
-					headingText: 'Title from onclick', wrapperClassName: 'titlebar' } )">Iframe</a>
+		<div id="iframe02" class="imageflow_iframe">
+			<a href="iframes/iframe02/index.html" onclick="return hs.htmlExpand(this, { 
+				width: 384, 
+				height: 512, 
+				headingText: 'Image and Link',
+				objectType: 'iframe'} )"><img src="expand.png"  width="30" height="30" alt="expand" /></a>
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe02/index.html" name="image_and_link" ></iframe>
+		</div>
+
+		<div id="iframe03" class="imageflow_iframe">
+			<a href="iframes/iframe03/index.html" onclick="return hs.htmlExpand(this, { 
+				width: 500, 
+				height: 500, 
+				headingText: 'javascript (Processing.js)',
+				objectType: 'iframe'} )"><img src="expand.png"  width="30" height="30" alt="expand" /></a>
+			<iframe scrolling="no" frameborder="0" src="iframes/iframe03/index.html" name="javascript" ></iframe>
+		</div>
 
 	</body>
 </html>
