@@ -1,0 +1,7 @@
+h1. ImageFlow - Marriott International version
+
+This version alters the original ImageFlow to display iframes on top of the focussed image. It also works with Highslide JS to expand the iframes.
+
+h2. Project Info
+
+* *Demo*: "http://testground.finnrudolph.de/js/ImageFlow_1.2.2_Marriott/":http://testground.finnrudolph.de/js/ImageFlow_1.2.2_Marriott/
