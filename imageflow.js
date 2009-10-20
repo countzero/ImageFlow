@@ -526,7 +526,7 @@ function ImageFlow ()
 							if(image.iframeId)
 							{
 								var iframe = document.getElementById(image.iframeId);
-								iframe.style.left = image.offsetLeft -1 + 'px';
+								iframe.style.left = image.offsetLeft + thisObject.ImageFlowDiv.offsetLeft - 1 + 'px';
 								if(newImageW && newImageH)
 								{
 									iframe.style.height = ((image.getAttribute('height') / image.w * image.pc) / z * thisObject.size) + 2 + 'px';
