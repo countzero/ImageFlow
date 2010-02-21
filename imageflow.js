@@ -1,10 +1,10 @@
-/*
+﻿/*
 Name:       ImageFlow
-Version:    1.2.1 (August 10 2009)
+Version:    1.3.0 (Februar 21 2010)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
-Licence:    ImageFlow is licensed under a Creative Commons 
+License:    ImageFlow is licensed under a Creative Commons 
             Attribution-Noncommercial 3.0 Unported License 
             (http://creativecommons.org/licenses/by-nc/3.0/).
 
@@ -221,7 +221,7 @@ function ImageFlow ()
 	this.loadingProgress = function()
 	{
 		var p = thisObject.loadingStatus();
-		if(p < 100 || thisObject.firstCheck === true && thisObject.preloadImages === true)
+		if((p < 100 || thisObject.firstCheck === true) && thisObject.preloadImages === true)
 		{
 			/* Insert a short delay if the browser loads rapidly from its cache */
 			if(thisObject.firstCheck === true && p == 100)
