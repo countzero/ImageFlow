@@ -69,9 +69,11 @@ function ImageFlow ()
 		xStep:              150             /* Step width on the x-axis in px */
 	};
 	
+
 	/* Closure for this */
 	var my = this;
 
+	
 	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
@@ -88,7 +90,7 @@ function ImageFlow ()
 			/* Set it global within the ImageFlow scope */
 			ImageFlowDiv.style.visibility = 'visible';
 			this.ImageFlowDiv = ImageFlowDiv;
-
+			
 			/* Try to create XHTML structure */
 			if(this.createStructure())
 			{
@@ -126,6 +128,7 @@ function ImageFlow ()
 			}
 		}
 	};
+
 	
 	/* Create HTML Structure */
 	this.createStructure = function()
@@ -239,34 +242,26 @@ function ImageFlow ()
 			/* Refresh ImageFlow on window resize - delay adding this event for the IE */
 			window.setTimeout(my.Helper.addResizeEvent, 1000);
 
-			/* Initialize mouse, touch and key support */
-			my.MouseWheel.init();
-			my.MouseDrag.init();
-			my.Touch.init();
-			my.Key.init();
-
 			/* Call refresh function */
-			my.refresh(true);
-
-			/* Unhide scrollbar elements */
-			document.getElementById(my.ImageFlowID+'_scrollbar').style.visibility = 'visible';
-
-			/* Glide to start image */
-			var startID = my.startID-1;
-			if (startID < 0 )
+			my.refresh();
+			
+			/* Only initialize navigation elements if there is more than one image */
+			if(my.max > 1)
 			{
-				startID = 0;
-			}
-			if (startID > my.max)
-			{
-				startID = my.max -1;
-			}
-			my.glideTo(startID);
+				/* Initialize mouse, touch and key support */
+				my.MouseWheel.init();
+				my.MouseDrag.init();
+				my.Touch.init();
+				my.Key.init();
 
-			/* Animate images moving in from the right */
-			if(my.startAnimation === true)
-			{
-				my.moveTo(5000);
+				/* Unhide scrollbar elements */
+				document.getElementById(my.ImageFlowID+'_scrollbar').style.visibility = 'visible';
+
+				/* Animate images moving in from the right */
+				if(my.startAnimation === true)
+				{
+					my.moveTo(5000);
+				}
 			}
 		}
 	};
@@ -416,14 +411,31 @@ function ImageFlow ()
 			my.navigationDiv.style.height =  (my.maxHeight - image.h) + 'px'; 
 		}
 
-		/* Reset variable */
+		/* Handle startID on the first refresh */
 		if(my.firstRefresh)
 		{
+			/* Reset variable */
 			my.firstRefresh = false;
+		
+			/* Set image id to start id */
+			my.imageID = my.startID-1;
+			if (my.imageID < 0 )
+			{
+				my.imageID = 0;
+			}
+			if (my.imageID > my.max)
+			{
+				my.imageID = my.max -1;
+			}
 		}
 
+		/* Only animate if there is more than one image */
+		if(my.max > 1)
+		{
+			my.glideTo(my.imageID);
+		}
+		
 		/* Display images in current order */
-		my.glideTo(my.imageID);
 		my.moveTo(my.current);
 	};
 
@@ -705,7 +717,7 @@ function ImageFlow ()
 	};
 	
 	
-	/* Mouse Dragging*/
+	/* Mouse Dragging */
 	this.MouseDrag =
 	{
 		object: null,
