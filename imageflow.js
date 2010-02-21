@@ -39,6 +39,7 @@ function ImageFlow ()
 	/* Setting option defaults */
 	this.defaults =
 	{
+		animationSpeed:     50,             /* Animation speed in ms */
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
 		buttons:            false,          /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
@@ -67,12 +68,10 @@ function ImageFlow ()
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
 	};
-
 	
 	/* Closure for this */
 	var my = this;
 
-	
 	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
@@ -110,7 +109,7 @@ function ImageFlow ()
 				this.firstCheck = true;
 				this.busy = false;
 
-				/* Toggle Slider */
+				/* Toggle slider */
 				if(this.slider === false)
 				{
 					this.scrollbarDiv.style.display = 'none';
@@ -458,7 +457,7 @@ function ImageFlow ()
 					/* Still hide images until they are processed, but set display style to block */
 					image.style.display = 'block';
 
-					/* Process new image height and image width */
+					/* Process new image height and width */
 					var newImageH = (image.h / image.w * image.pc) / z * my.size;
 					var newImageW = 0;
 					switch (newImageH > my.maxHeight)
@@ -617,8 +616,8 @@ function ImageFlow ()
 		/* Animate gliding to new x position */
 		if (my.busy === false)
 		{
-			window.setTimeout(my.animate, 50);
 			my.busy = true;
+			my.animate();			
 		}
 	};
 
@@ -630,7 +629,7 @@ function ImageFlow ()
 		{
 			case true:
 				my.moveTo(my.current + (my.target-my.current)/3);
-				window.setTimeout(my.animate, 50);
+				window.setTimeout(my.animate, my.animationSpeed);
 				my.busy = true;
 				break;
 
