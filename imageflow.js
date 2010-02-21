@@ -64,6 +64,8 @@ function ImageFlow ()
 		slider:             true,           /* Toggle slider */
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
 		sliderWidth:        14,             /* Width of the slider in px */
+		slideshow:          true,           /* Toggle slideshow */
+		slideshowSpeed:     500,            /* Time between slides in ms */
 		startID:            1,              /* Glide to this image ID on startup */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
@@ -110,12 +112,6 @@ function ImageFlow ()
 				this.firstRefresh = true;
 				this.firstCheck = true;
 				this.busy = false;
-
-				/* Toggle slider */
-				if(this.slider === false)
-				{
-					this.scrollbarDiv.style.display = 'none';
-				}
 
 				/* Set height of the ImageFlow container and center the loading bar */
 				var width = this.ImageFlowDiv.offsetWidth;
@@ -242,7 +238,7 @@ function ImageFlow ()
 			/* Refresh ImageFlow on window resize - delay adding this event for the IE */
 			window.setTimeout(my.Helper.addResizeEvent, 1000);
 
-			/* Call refresh function */
+			/* Call refresh once on startup to display images */
 			my.refresh();
 			
 			/* Only initialize navigation elements if there is more than one image */
@@ -253,14 +249,11 @@ function ImageFlow ()
 				my.MouseDrag.init();
 				my.Touch.init();
 				my.Key.init();
-
-				/* Unhide scrollbar elements */
-				document.getElementById(my.ImageFlowID+'_scrollbar').style.visibility = 'visible';
-
-				/* Animate images moving in from the right */
-				if(my.startAnimation === true)
+				
+				/* Toggle scrollbar visibility */
+				if(my.slider)
 				{
-					my.moveTo(5000);
+					my.scrollbarDiv.style.visibility = 'visible';
 				}
 			}
 		}
@@ -417,7 +410,7 @@ function ImageFlow ()
 			/* Reset variable */
 			my.firstRefresh = false;
 		
-			/* Set image id to start id */
+			/* Set imageID to the startID */
 			my.imageID = my.startID-1;
 			if (my.imageID < 0 )
 			{
@@ -426,6 +419,12 @@ function ImageFlow ()
 			if (my.imageID > my.max)
 			{
 				my.imageID = my.max -1;
+			}
+			
+			/* Animate images moving in from the right */
+			if(my.startAnimation)
+			{
+				my.moveTo(5000);
 			}
 		}
 
