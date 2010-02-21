@@ -41,7 +41,7 @@ function ImageFlow ()
 	{
 		animationSpeed:     50,             /* Animation speed in ms */
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
-		buttons:            false,          /* Toggle navigation buttons */
+		buttons:            true,          /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
@@ -65,7 +65,8 @@ function ImageFlow ()
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
 		sliderWidth:        14,             /* Width of the slider in px */
 		slideshow:          true,           /* Toggle slideshow */
-		slideshowSpeed:     500,            /* Time between slides in ms */
+		slideshowSpeed:     1500,           /* Time between slides in ms */
+		slideshowAutoplay:  false,           /* Toggle automatic slideshow play on startup */
 		startID:            1,              /* Glide to this image ID on startup */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
@@ -103,6 +104,7 @@ function ImageFlow ()
 				this.sliderDiv = document.getElementById(my.ImageFlowID+'_slider');
 				this.buttonNextDiv = document.getElementById(my.ImageFlowID+'_next');
 				this.buttonPreviousDiv = document.getElementById(my.ImageFlowID+'_previous');
+				this.buttonSlideshow = document.getElementById(my.ImageFlowID+'_slideshow');
 
 				this.indexArray = [];
 				this.current = 0;
@@ -157,7 +159,14 @@ function ImageFlow ()
 				imagesDiv.appendChild(imageNode);
 			}
 		}
-
+		
+		/* Create slideshow button div and append it to the images div */
+		if(my.slideshow)
+		{
+			var slideshowButton = my.Helper.createDocumentElement('div','slideshow');
+			imagesDiv.appendChild(slideshowButton);
+		}
+		
 		/* Create loading text container */
 		var loadingP = my.Helper.createDocumentElement('p','loading_txt');
 		var loadingText = document.createTextNode(' ');
@@ -249,6 +258,12 @@ function ImageFlow ()
 				my.MouseDrag.init();
 				my.Touch.init();
 				my.Key.init();
+				
+				/* Toggle slideshow */
+				if(my.slideshow)
+				{
+					my.Slideshow.init();
+				}
 				
 				/* Toggle scrollbar visibility */
 				if(my.slider)
@@ -651,6 +666,65 @@ function ImageFlow ()
 	};
 	
 	
+	/* Slideshow function */
+	this.Slideshow =
+	{
+		direction: 1,
+		
+		init: function()
+		{
+			/* Call start() if autoplay is enabled, stop() if it is disabled */
+			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();
+		},
+		start: function()
+		{
+			/* Set button style to pause */
+			my.Helper.setClassName(my.buttonSlideshow, 'slideshow pause');
+
+			/* Set onclick behaviour to stop */
+			my.buttonSlideshow.onclick = function () { my.Slideshow.stop(); };
+			
+			/* Set slide interval */
+			my.Slideshow.action = window.setInterval(my.Slideshow.slide, my.slideshowSpeed);
+		},
+		
+		stop: function()
+		{
+			/* Set button style to play */
+			my.Helper.setClassName(my.buttonSlideshow, 'slideshow play');
+			
+			/* Set onclick behaviour to start */
+			my.buttonSlideshow.onclick = function () { my.Slideshow.start(); };
+			
+			/* Clear slide interval */
+			window.clearInterval(my.Slideshow.action);
+		},
+		
+		slide: function()
+		{
+			var newImageID = my.imageID + my.Slideshow.direction;
+			var reverseDirection = false;
+			
+			/* Reverse direction at the last image on the right */
+			if(newImageID === my.max)
+			{
+				my.Slideshow.direction = -1;
+				reverseDirection = true;				
+			}
+			
+			/* Reverse direction at the last image on the left */
+			if(newImageID < 0)
+			{
+				my.Slideshow.direction = 1;
+				reverseDirection = true;
+			}
+			
+			/* If direction is reversed recall this method, else call the glideTo method */
+			(reverseDirection) ? my.Slideshow.slide() : my.glideTo(newImageID);
+		}
+	};
+
+	
 	/* Mouse Wheel support */
 	this.MouseWheel =
 	{
@@ -748,7 +822,6 @@ function ImageFlow ()
 		{
 			my.MouseDrag.object = o;
 			my.MouseDrag.objectX = my.MouseDrag.mouseX - o.offsetLeft + my.newSliderX;
-
 		},
 
 		stop: function()
@@ -898,8 +971,6 @@ function ImageFlow ()
 		stop: function()
 		{
 			my.Touch.stopX = my.Touch.x;
-			//my.Touch.stopX = -(my.Touch.x - my.imagesDivWidth);
-			
 			my.Touch.busy = false;
 		}
 	};
@@ -959,6 +1030,26 @@ function ImageFlow ()
 			}
 		},
 		
+		/* Remove events */
+		removeEvent: function( obj, type, fn )
+		{
+			if (obj.removeEventListener)
+			{
+				obj.removeEventListener( type, fn, false );
+			}
+			else if (obj.detachEvent)
+			{
+				/* The IE breaks if you're trying to detach an unattached event http://msdn.microsoft.com/en-us/library/ms536411(VS.85).aspx */
+				if(obj[type+fn] === undefined)
+				{
+					alert('Helper.removeEvent » Pointer to detach event is undefined - perhaps you are trying to detach an unattached event?');
+				}
+				obj.detachEvent( 'on'+type, obj[type+fn] );
+				obj[type+fn] = null;
+				obj['e'+type+fn] = null;
+			}
+		},
+		
 		/* Set image opacity */
 		setOpacity: function(object, value)
 		{
@@ -969,18 +1060,27 @@ function ImageFlow ()
 			}
 		},
 		
-		/* Creates HTML elements */
+		/* Create HTML elements */
 		createDocumentElement: function(type, id, optionalClass)
 		{
 			var element = document.createElement(type);
-			element.setAttribute('id',my.ImageFlowID+'_'+id);
+			element.setAttribute('id', my.ImageFlowID+'_'+id);
 			if(optionalClass !== undefined)
 			{
 				id += ' '+optionalClass;
 			}
-			element.setAttribute('class',id);
-			element.setAttribute('className',id);
+			my.Helper.setClassName(element, id);
 			return element;
+		},
+		
+		/* Set CSS class */
+		setClassName: function(element, className)
+		{
+			if(element)
+			{
+				element.setAttribute('class', className);
+				element.setAttribute('className', className);
+			}
 		},
 		
 		/* Suppress default browser behaviour to avoid image/text selection while dragging */
@@ -997,7 +1097,7 @@ function ImageFlow ()
 			return false;
 		},
 		
-		/* Adds functions to the window.onresize event - can not be done by addEvent */
+		/* Add functions to the window.onresize event - can not be done by addEvent */
 		addResizeEvent: function()
 		{
 			var otherFunctions = window.onresize;

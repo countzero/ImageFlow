@@ -54,13 +54,26 @@
 		height:1px;
 	}
 	.imageflow .slider {
-		background-image:url(slider.png);
-		background-repeat:no-repeat;
+		background:url(slider.png) no-repeat;
 		height:14px;
 		margin:-6px 0 0 -7px;
 		position:absolute;
 		width:14px;
 		z-index:10003;
+	}
+	.imageflow .slideshow {
+		cursor:pointer;
+		height:14px;
+		margin:20px 0 0 20px;
+		position:absolute;
+		width:14px;
+		z-index:10003;
+	}
+	.imageflow .slideshow.pause {
+		background:url(button_pause.png) no-repeat;
+	}
+	.imageflow .slideshow.play {
+		background:url(button_play.png) no-repeat;
 	}
 	.imageflow .images {
 		overflow:hidden;
