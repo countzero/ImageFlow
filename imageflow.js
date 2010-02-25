@@ -1,6 +1,6 @@
 ﻿/*
 Name:       ImageFlow
-Version:    1.3.0 (Februar 21 2010)
+Version:    1.3.0 (Februar 25 2010)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -66,7 +66,7 @@ function ImageFlow ()
 		sliderWidth:        14,             /* Width of the slider in px */
 		slideshow:          true,           /* Toggle slideshow */
 		slideshowSpeed:     1500,           /* Time between slides in ms */
-		slideshowAutoplay:  false,           /* Toggle automatic slideshow play on startup */
+		slideshowAutoplay:  true,           /* Toggle automatic slideshow play on startup */
 		startID:            1,              /* Glide to this image ID on startup */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
@@ -674,8 +674,24 @@ function ImageFlow ()
 		init: function()
 		{
 			/* Call start() if autoplay is enabled, stop() if it is disabled */
-			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();
+			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();	
 		},
+		
+		interrupt: function()
+		{	
+			/* Remove interrupt event */
+			my.Helper.removeEvent(my.ImageFlowDiv,'click',my.Slideshow.interrupt);
+			
+			/* Interrupt the slideshow */
+			my.Slideshow.stop();
+		},
+		
+		addInterruptEvent: function()
+		{
+			/* A click anywhere inside the ImageFlow div interrupts the slideshow */
+			my.Helper.addEvent(my.ImageFlowDiv,'click',my.Slideshow.interrupt);
+		},
+		
 		start: function()
 		{
 			/* Set button style to pause */
@@ -686,6 +702,9 @@ function ImageFlow ()
 			
 			/* Set slide interval */
 			my.Slideshow.action = window.setInterval(my.Slideshow.slide, my.slideshowSpeed);
+			
+			/* Allow the user to always interrupt the slideshow */
+			window.setTimeout(my.Slideshow.addInterruptEvent, 100);
 		},
 		
 		stop: function()
