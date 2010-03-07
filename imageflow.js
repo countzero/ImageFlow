@@ -1,6 +1,6 @@
 ﻿/*
 Name:       ImageFlow
-Version:    1.3.0 (Februar 25 2010)
+Version:    1.3.0 (March 07 2010)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -662,7 +662,7 @@ function ImageFlow ()
 				imageID = clonedImageID+1;
 			}
 		}
-		
+
 		/* Calculate new image position target */
 		var x = -imageID * my.xStep;
 		this.target = x;
@@ -680,7 +680,14 @@ function ImageFlow ()
 		/* Set scrollbar slider to new position */
 		if (my.MouseDrag.busy === false)
 		{
-			this.newSliderX = (imageID * my.scrollbarWidth) / (my.max-1) - my.MouseDrag.newX;
+			if(my.circular)
+			{
+				this.newSliderX = ((imageID-my.imageFocusMax) * my.scrollbarWidth) / (my.max-(my.imageFocusMax*2)-1) - my.MouseDrag.newX;
+			}
+			else
+			{
+				this.newSliderX = (imageID * my.scrollbarWidth) / (my.max-1) - my.MouseDrag.newX;
+			}
 			my.sliderDiv.style.marginLeft = (my.newSliderX - my.sliderWidth) + 'px';
 		}
 
@@ -972,8 +979,17 @@ function ImageFlow ()
 				}
 
 				/* Set new slider position */
-				var step = (newX + my.newSliderX) / (my.scrollbarWidth / (my.max-1));
-				var imageID = Math.round(step);
+				var step, imageID;
+				if(my.circular)
+				{
+					step = (newX + my.newSliderX) / (my.scrollbarWidth / (my.max-(my.imageFocusMax*2))+2);
+					imageID = Math.round(step)+my.imageFocusMax;
+				}
+				else
+				{
+					step = (newX + my.newSliderX) / (my.scrollbarWidth / (my.max-1));
+					imageID = Math.round(step);
+				}
 				my.MouseDrag.newX = newX;
 				my.MouseDrag.object.style.left = newX + 'px';
 				if(my.imageID !== imageID)
