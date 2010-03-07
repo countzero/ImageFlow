@@ -1,6 +1,6 @@
 ﻿/*
 Name:       ImageFlow
-Version:    1.3.0 (March 07 2010)
+Version:    1.3.0 (March 7 2010)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
@@ -47,7 +47,7 @@ function ImageFlow ()
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
-		imageFocusMax:      3,              /* Max number of images on each side of the focussed one */
+		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
 		imageScaling:       true,           /* Toggle image scaling */ 
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
 		imagesM:            1.0,            /* Multiplicator for all images in percent */
@@ -68,8 +68,8 @@ function ImageFlow ()
 		slideshow:          true,           /* Toggle slideshow */
 		slideshowSpeed:     1500,           /* Time between slides in ms */
 		slideshowAutoplay:  false,          /* Toggle automatic slideshow play on startup */
-		startID:            16,             /* Image ID to begin with */
-		glideToStartID:     false,          /* Toggle glide animation to start ID */
+		startID:            1,              /* Image ID to begin with */
+		glideToStartID:     true,           /* Toggle glide animation to start ID */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
 	};
@@ -168,7 +168,8 @@ function ImageFlow ()
 			
 			/* Clone the first and last images */
 			max = imagesDiv.childNodes.length;
-			for(var i = 0; i < max; i++)
+			var i;
+			for(i = 0; i < max; i++)
 			{
 				/* Number of clones on each side equals the imageFocusMax */
 				node = imagesDiv.childNodes[i];
@@ -185,13 +186,13 @@ function ImageFlow ()
 			}
 			
 			/* Sort the image nodes in the following order: last | originals | first */
-			for(var i = 0; i < max; i++)
+			for(i = 0; i < max; i++)
 			{
 				node = imagesDiv.childNodes[i];
 				imageNode = node.cloneNode(true);
 				last.appendChild(imageNode);
 			}
-			for(var i = 0; i < my.imageFocusMax; i++)
+			for(i = 0; i < my.imageFocusMax; i++)
 			{
 				node = first.childNodes[i];
 				imageNode = node.cloneNode(true);
@@ -637,10 +638,10 @@ function ImageFlow ()
 	this.glideTo = function(imageID)
 	{
 		/* Check for jumppoints */
+		var jumpTarget, clonedImageID;
 		if(my.circular)
 		{
 			/* Trigger left jumppoint */
-			var jumpTarget, clonedImageID;
 			if(imageID+1 === my.imageFocusMax)
 			{
 				/* Set jump target to the same cloned image on the right */
@@ -761,6 +762,20 @@ function ImageFlow ()
 				my.busy = false;
 				break;
 		}
+	};
+
+	
+	/* Used by user events to call the glideTo function */
+	this.glideOnEvent = function(imageID)
+	{
+		/* Interrupt slideshow on mouse wheel, keypress, touch and mouse drag */
+		if(my.slideshow)
+		{
+			my.Slideshow.interrupt();
+		}
+		
+		/* Glide to new imageID */
+		my.glideTo(imageID);
 	};
 	
 	
@@ -899,9 +914,9 @@ function ImageFlow ()
 			}
 
 			/* Glide to next (mouse wheel down) / previous (mouse wheel up) image  */
-			if (change === true)
+			if(change)
 			{
-				my.glideTo(newImageID);
+				my.glideOnEvent(newImageID);
 			}
 		}
 	};
@@ -927,7 +942,7 @@ function ImageFlow ()
 			my.ImageFlowDiv.onselectstart = function ()
 			{
 				var selection = true;
-				if (my.MouseDrag.busy === true)
+				if (my.MouseDrag.busy)
 				{
 					selection = false;
 				}
@@ -994,7 +1009,7 @@ function ImageFlow ()
 				my.MouseDrag.object.style.left = newX + 'px';
 				if(my.imageID !== imageID)
 				{
-					my.glideTo(imageID);
+					my.glideOnEvent(imageID);
 				}
 				my.MouseDrag.busy = true;
 			}
@@ -1053,7 +1068,7 @@ function ImageFlow ()
 		isBusy: function()
 		{
 			var busy = false;
-			if(my.Touch.busy === true)
+			if(my.Touch.busy)
 			{
 				busy = true;
 			}
@@ -1065,9 +1080,10 @@ function ImageFlow ()
 		{
 			if(my.Touch.isBusy && my.Touch.isOnNavigationDiv(e))
 			{
+				var max = (my.circular) ? (my.max-(my.imageFocusMax*2)-1) : (my.max-1);
 				if(my.Touch.first)
 				{
-					my.Touch.stopX = ((my.max-1)-my.imageID) * (my.imagesDivWidth / (my.max-1));
+					my.Touch.stopX = (max - my.imageID) * (my.imagesDivWidth / max);
 					my.Touch.first = false;
 				}
 				var newX = -(my.Touch.getX(e) - my.Touch.startX - my.Touch.stopX);
@@ -1084,11 +1100,15 @@ function ImageFlow ()
 
 				my.Touch.x = newX;
 				
-				var imageID = Math.round(newX / (my.imagesDivWidth / (my.max-1)));
-				imageID = (my.max-1)-imageID;
+				var imageID = Math.round(newX / (my.imagesDivWidth / max));
+				imageID = max - imageID;
 				if(my.imageID !== imageID)
 				{
-					my.glideTo(imageID);
+					if(my.circular)
+					{
+						imageID = imageID + my.imageFocusMax;
+					}
+					my.glideOnEvent(imageID);
 				}
 				my.Helper.suppressBrowserDefault(e);
 			}
