@@ -41,12 +41,13 @@ function ImageFlow ()
 	{
 		animationSpeed:     50,             /* Animation speed in ms */
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
-		buttons:            true,          /* Toggle navigation buttons */
+		buttons:            true,           /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
+		circular:           true,           /* Toggle circular rotation */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
-		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
+		imageFocusMax:      3,              /* Max number of images on each side of the focussed one */
 		imageScaling:       true,           /* Toggle image scaling */ 
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
 		imagesM:            1.0,            /* Multiplicator for all images in percent */
@@ -66,8 +67,9 @@ function ImageFlow ()
 		sliderWidth:        14,             /* Width of the slider in px */
 		slideshow:          true,           /* Toggle slideshow */
 		slideshowSpeed:     1500,           /* Time between slides in ms */
-		slideshowAutoplay:  true,           /* Toggle automatic slideshow play on startup */
-		startID:            1,              /* Glide to this image ID on startup */
+		slideshowAutoplay:  false,          /* Toggle automatic slideshow play on startup */
+		startID:            16,             /* Image ID to begin with */
+		glideToStartID:     false,          /* Toggle glide animation to start ID */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
 	};
@@ -135,29 +137,69 @@ function ImageFlow ()
 		var imagesDiv = my.Helper.createDocumentElement('div','images');
 
 		/* Shift all images into the images div */
-		var node = null;
-		var max = this.ImageFlowDiv.childNodes.length;
+		var node, version, src, imageNode;
+		var max = my.ImageFlowDiv.childNodes.length;
 		for(var index = 0; index < max; index++)
 		{
-			node = this.ImageFlowDiv.childNodes[index];
+			node = my.ImageFlowDiv.childNodes[index];
 			if (node && node.nodeType == 1 && node.nodeName == 'IMG')
 			{
 				/* Add 'reflect.php?img=' */
 				if(my.reflections === true)
 				{
-					var version = '2';
-					if(my.reflectionPNG === true)
-					{
-						version = '3';
-					}
-					var src = node.getAttribute('src',2);
-					src =  'reflect'+version+'.php?img='+src+my.reflectionGET;
+					version = (my.reflectionPNG) ? '3' : '2';
+					src = node.getAttribute('src',2);
+					src = 'reflect'+version+'.php?img='+src+my.reflectionGET;
 					node.setAttribute('src',src);
 				}
 
-				var imageNode = node.cloneNode(true);
+				/* Clone image nodes and append them to the images div */
+				imageNode = node.cloneNode(true);
 				imagesDiv.appendChild(imageNode);
 			}
+		}
+		
+		/* Clone some more images to make a circular animation possible */
+		if(my.circular)
+		{
+			/* Create temporary elements to hold the cloned images */
+			var first = my.Helper.createDocumentElement('div','images');
+			var last = my.Helper.createDocumentElement('div','images');
+			
+			/* Clone the first and last images */
+			max = imagesDiv.childNodes.length;
+			for(var i = 0; i < max; i++)
+			{
+				/* Number of clones on each side equals the imageFocusMax */
+				node = imagesDiv.childNodes[i];
+				if(i < my.imageFocusMax)
+				{
+					imageNode = node.cloneNode(true);
+					first.appendChild(imageNode);
+				}
+				if(max-i < my.imageFocusMax+1)
+				{
+					imageNode = node.cloneNode(true);
+					last.appendChild(imageNode);
+				}
+			}
+			
+			/* Sort the image nodes in the following order: last | originals | first */
+			for(var i = 0; i < max; i++)
+			{
+				node = imagesDiv.childNodes[i];
+				imageNode = node.cloneNode(true);
+				last.appendChild(imageNode);
+			}
+			for(var i = 0; i < my.imageFocusMax; i++)
+			{
+				node = first.childNodes[i];
+				imageNode = node.cloneNode(true);
+				last.appendChild(imageNode);
+			}
+			
+			/* Overwrite the imagesDiv with the new order */
+			imagesDiv = last;
 		}
 		
 		/* Create slideshow button div and append it to the images div */
@@ -207,12 +249,13 @@ function ImageFlow ()
 			my.ImageFlowDiv.appendChild(navigationDiv))
 		{
 			/* Remove image nodes outside the images div */
+			max = my.ImageFlowDiv.childNodes.length;
 			for(index = 0; index < max; index++)
 			{
-				node = this.ImageFlowDiv.childNodes[index];
+				node = my.ImageFlowDiv.childNodes[index];
 				if (node && node.nodeType == 1 && node.nodeName == 'IMG')
 				{
-					this.ImageFlowDiv.removeChild(node);
+					my.ImageFlowDiv.removeChild(node);
 				}
 			}
 			success = true;
@@ -431,9 +474,24 @@ function ImageFlow ()
 			{
 				my.imageID = 0;
 			}
-			if (my.imageID > my.max)
+			
+			/* Map image id range in cicular mode (ignore the cloned images) */
+			if(my.circular)
+			{	
+				my.imageID = my.imageID + my.imageFocusMax;
+			}
+			
+			/* Make sure, that the id is smaller than the image count  */
+			maxId = (my.circular) ?  (my.max-(my.imageFocusMax))-1 : my.max-1;
+			if (my.imageID > maxId)
 			{
-				my.imageID = my.max -1;
+				my.imageID = maxId;
+			}
+			
+			/* Toggle glide animation to start ID */
+			if(my.glideToStartID === false)
+			{	
+				my.moveTo(-my.imageID * my.xStep);
 			}
 			
 			/* Animate images moving in from the right */
@@ -578,6 +636,33 @@ function ImageFlow ()
 	/* Initializes image gliding animation */
 	this.glideTo = function(imageID)
 	{
+		/* Check for jumppoints */
+		if(my.circular)
+		{
+			/* Trigger left jumppoint */
+			var jumpTarget, clonedImageID;
+			if(imageID+1 === my.imageFocusMax)
+			{
+				/* Set jump target to the same cloned image on the right */
+				clonedImageID = my.max - my.imageFocusMax;
+				jumpTarget = -clonedImageID * my.xStep;
+
+				/* Set the imageID to the last image */
+				imageID = clonedImageID-1 ;
+			}
+			
+			/* Trigger right jumppoint */
+			if(imageID === (my.max - my.imageFocusMax))
+			{
+				/* Set jump target to the same cloned image on the left */
+				clonedImageID = my.imageFocusMax-1;
+				jumpTarget = -clonedImageID * my.xStep;
+				
+				/* Set the imageID to the first image */
+				imageID = clonedImageID+1;
+			}
+		}
+		
 		/* Calculate new image position target */
 		var x = -imageID * my.xStep;
 		this.target = x;
@@ -637,6 +722,12 @@ function ImageFlow ()
 					my.imagesDiv.childNodes[leftID].pc = my.imagesDiv.childNodes[leftID].pcMem;
 				}
 			}
+		}
+		
+		/* Move the images to the jump target */
+		if(jumpTarget)
+		{
+			my.moveTo(jumpTarget);
 		}
 
 		/* Animate gliding to new x position */
