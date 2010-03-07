@@ -43,11 +43,12 @@ function ImageFlow ()
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
 		buttons:            true,           /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
-		circular:           false,          /* Toggle circular rotation */
+		circular:           true,           /* Toggle circular rotation */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
 		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
+		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
 		imageScaling:       true,           /* Toggle image scaling */ 
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
 		imagesM:            1.0,            /* Multiplicator for all images in percent */
@@ -61,6 +62,7 @@ function ImageFlow ()
 		reflectionGET:      '',             /* Pass variables via the GET method to the reflect_.php script */
 		reflectionP:        0.5,            /* Height of the reflection in percent of the source image */
 		reflectionPNG:      false,          /* Toggle reflect2.php or reflect3.php */
+		reflectPath:        '',             /* Path to the reflect_.php script */
 		scrollbarP:         0.6,            /* Width of the scrollbar in percent */
 		slider:             true,           /* Toggle slider */
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
@@ -73,7 +75,7 @@ function ImageFlow ()
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
 		xStep:              150             /* Step width on the x-axis in px */
 	};
-	
+
 
 	/* Closure for this */
 	var my = this;
@@ -148,8 +150,8 @@ function ImageFlow ()
 				if(my.reflections === true)
 				{
 					version = (my.reflectionPNG) ? '3' : '2';
-					src = node.getAttribute('src',2);
-					src = 'reflect'+version+'.php?img='+src+my.reflectionGET;
+					src = my.imagePath+node.getAttribute('src',2);
+					src = my.reflectPath+'reflect'+version+'.php?img='+src+my.reflectionGET;
 					node.setAttribute('src',src);
 				}
 
@@ -346,7 +348,7 @@ function ImageFlow ()
 		if(my.circular)
 		{
 			i = i - (my.imageFocusMax*2);
-			completed = Math.round((i/finished)*100);
+			completed = (finished < 1) ? 0 : Math.round((i/100)*finished);
 		}
 		
 		var loadingP = document.getElementById(my.ImageFlowID+'_loading_txt');
