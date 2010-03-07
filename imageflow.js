@@ -43,7 +43,7 @@ function ImageFlow ()
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
 		buttons:            true,           /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
-		circular:           true,           /* Toggle circular rotation */
+		circular:           false,          /* Toggle circular rotation */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
@@ -269,10 +269,10 @@ function ImageFlow ()
 	this.loadingProgress = function()
 	{
 		var p = my.loadingStatus();
-		if((p < 100 || my.firstCheck === true) && my.preloadImages === true)
+		if((p < 100 || my.firstCheck) && my.preloadImages)
 		{
 			/* Insert a short delay if the browser loads rapidly from its cache */
-			if(my.firstCheck === true && p == 100)
+			if(my.firstCheck && p == 100)
 			{
 				my.firstCheck = false;
 				window.setTimeout(my.loadingProgress, 100);
@@ -328,19 +328,27 @@ function ImageFlow ()
 		for(var index = 0; index < max; index++)
 		{
 			image = my.imagesDiv.childNodes[index];
-			if (image && image.nodeType == 1 && image.nodeName == 'IMG')
+			if(image && image.nodeType == 1 && image.nodeName == 'IMG')
 			{
-				if (image.complete === true)
+				if(image.complete)
 				{
 					completed++;
 				}
 				i++;
 			}
 		}
+		
 		var finished = Math.round((completed/i)*100);
 		var loadingBar = document.getElementById(my.ImageFlowID+'_loading_bar');
 		loadingBar.style.width = finished+'%';
 
+		/* Do not count the cloned images */
+		if(my.circular)
+		{
+			i = i - (my.imageFocusMax*2);
+			completed = Math.round((i/finished)*100);
+		}
+		
 		var loadingP = document.getElementById(my.ImageFlowID+'_loading_txt');
 		var loadingTxt = document.createTextNode('loading images '+completed+'/'+i);
 		loadingP.replaceChild(loadingTxt,loadingP.firstChild);
