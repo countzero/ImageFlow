@@ -1,11 +1,11 @@
 ﻿/*
 Name:       ImageFlow
-Version:    1.3.0 (March 7 2010)
+Version:    1.3.0 (March 9 2010)
 Author:     Finn Rudolph
 Support:    http://finnrudolph.de/ImageFlow
 
-License:    ImageFlow is licensed under a Creative Commons 
-            Attribution-Noncommercial 3.0 Unported License 
+License:    ImageFlow is licensed under a Creative Commons
+            Attribution-Noncommercial 3.0 Unported License
             (http://creativecommons.org/licenses/by-nc/3.0/).
 
             You are free:
@@ -13,18 +13,18 @@ License:    ImageFlow is licensed under a Creative Commons
                 + to Remix - to adapt the work
 
             Under the following conditions:
-                + Attribution. You must attribute the work in the manner specified by the author or licensor 
-                  (but not in any way that suggests that they endorse you or your use of the work). 
-                + Noncommercial. You may not use this work for commercial purposes. 
+                + Attribution. You must attribute the work in the manner specified by the author or licensor
+                  (but not in any way that suggests that they endorse you or your use of the work).
+                + Noncommercial. You may not use this work for commercial purposes.
 
             + For any reuse or distribution, you must make clear to others the license terms of this work.
             + Any of the above conditions can be waived if you get permission from the copyright holder.
             + Nothing in this license impairs or restricts the author's moral rights.
 
 Credits:    This script is based on Michael L. Perrys Cover flow in Javascript [1].
-            The reflections are generated server-sided by a slightly hacked version 
-            of Richard Daveys easyreflections [2] written in PHP. The mouse wheel 
-            support is an implementation of Adomas Paltanavicius JavaScript mouse 
+            The reflections are generated server-sided by a slightly hacked version
+            of Richard Daveys easyreflections [2] written in PHP. The mouse wheel
+            support is an implementation of Adomas Paltanavicius JavaScript mouse
             wheel code [3]. It also uses the domReadyEvent from Tanny O'Haley [4].
 
             [1] http://www.adventuresinsoftware.com/blog/?p=104#comment-1981
@@ -41,9 +41,9 @@ function ImageFlow ()
 	{
 		animationSpeed:     50,             /* Animation speed in ms */
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
-		buttons:            true,           /* Toggle navigation buttons */
+		buttons:            false,          /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
-		circular:           true,           /* Toggle circular rotation */
+		circular:           false,          /* Toggle circular rotation */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
@@ -67,7 +67,7 @@ function ImageFlow ()
 		slider:             true,           /* Toggle slider */
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
 		sliderWidth:        14,             /* Width of the slider in px */
-		slideshow:          true,           /* Toggle slideshow */
+		slideshow:          false,          /* Toggle slideshow */
 		slideshowSpeed:     1500,           /* Time between slides in ms */
 		slideshowAutoplay:  false,          /* Toggle automatic slideshow play on startup */
 		startID:            1,              /* Image ID to begin with */
@@ -80,7 +80,7 @@ function ImageFlow ()
 	/* Closure for this */
 	var my = this;
 
-	
+
 	/* Initiate ImageFlow */
 	this.init = function (options)
 	{
@@ -97,7 +97,7 @@ function ImageFlow ()
 			/* Set it global within the ImageFlow scope */
 			ImageFlowDiv.style.visibility = 'visible';
 			this.ImageFlowDiv = ImageFlowDiv;
-			
+
 			/* Try to create XHTML structure */
 			if(this.createStructure())
 			{
@@ -131,7 +131,7 @@ function ImageFlow ()
 		}
 	};
 
-	
+
 	/* Create HTML Structure */
 	this.createStructure = function()
 	{
@@ -160,7 +160,7 @@ function ImageFlow ()
 				imagesDiv.appendChild(imageNode);
 			}
 		}
-		
+
 		/* Clone some more images to make a circular animation possible */
 		if(my.circular)
 		{
@@ -168,50 +168,60 @@ function ImageFlow ()
 			var first = my.Helper.createDocumentElement('div','images');
 			var last = my.Helper.createDocumentElement('div','images');
 			
-			/* Clone the first and last images */
+			/* Make sure, that there are enough images to use circular mode */
 			max = imagesDiv.childNodes.length;
-			var i;
-			for(i = 0; i < max; i++)
+			if(max < my.imageFocusMax)
 			{
-				/* Number of clones on each side equals the imageFocusMax */
-				node = imagesDiv.childNodes[i];
-				if(i < my.imageFocusMax)
+				my.imageFocusMax = max;
+			}
+
+			/* Do not clone anything if there is only one image */
+			if(max > 1)
+			{
+				/* Clone the first and last images */
+				var i;
+				for(i = 0; i < max; i++)
 				{
-					imageNode = node.cloneNode(true);
-					first.appendChild(imageNode);
+					/* Number of clones on each side equals the imageFocusMax */
+					node = imagesDiv.childNodes[i];
+					if(i < my.imageFocusMax)
+					{
+						imageNode = node.cloneNode(true);
+						first.appendChild(imageNode);
+					}
+					if(max-i < my.imageFocusMax+1)
+					{
+						imageNode = node.cloneNode(true);
+						last.appendChild(imageNode);
+					}
 				}
-				if(max-i < my.imageFocusMax+1)
+
+				/* Sort the image nodes in the following order: last | originals | first */
+				for(i = 0; i < max; i++)
 				{
+					node = imagesDiv.childNodes[i];
 					imageNode = node.cloneNode(true);
 					last.appendChild(imageNode);
 				}
+				for(i = 0; i < my.imageFocusMax; i++)
+				{
+					node = first.childNodes[i];
+					imageNode = node.cloneNode(true);
+					last.appendChild(imageNode);
+				}
+				
+				/* Overwrite the imagesDiv with the new order */
+				imagesDiv = last;
 			}
-			
-			/* Sort the image nodes in the following order: last | originals | first */
-			for(i = 0; i < max; i++)
-			{
-				node = imagesDiv.childNodes[i];
-				imageNode = node.cloneNode(true);
-				last.appendChild(imageNode);
-			}
-			for(i = 0; i < my.imageFocusMax; i++)
-			{
-				node = first.childNodes[i];
-				imageNode = node.cloneNode(true);
-				last.appendChild(imageNode);
-			}
-			
-			/* Overwrite the imagesDiv with the new order */
-			imagesDiv = last;
 		}
-		
+
 		/* Create slideshow button div and append it to the images div */
 		if(my.slideshow)
 		{
 			var slideshowButton = my.Helper.createDocumentElement('div','slideshow');
 			imagesDiv.appendChild(slideshowButton);
 		}
-		
+
 		/* Create loading text container */
 		var loadingP = my.Helper.createDocumentElement('p','loading_txt');
 		var loadingText = document.createTextNode(' ');
@@ -224,13 +234,13 @@ function ImageFlow ()
 		var loadingBarDiv = my.Helper.createDocumentElement('div','loading_bar');
 		loadingDiv.appendChild(loadingBarDiv);
 
-		/* Create captions div container */		
+		/* Create captions div container */
 		var captionDiv = my.Helper.createDocumentElement('div','caption');
-		
+
 		/* Create slider and button div container inside the scrollbar div */
 		var scrollbarDiv = my.Helper.createDocumentElement('div','scrollbar');
 		var sliderDiv = my.Helper.createDocumentElement('div','slider');
-		scrollbarDiv.appendChild(sliderDiv);		
+		scrollbarDiv.appendChild(sliderDiv);
 		if(my.buttons)
 		{
 			var buttonPreviousDiv = my.Helper.createDocumentElement('div','previous', 'button');
@@ -238,7 +248,7 @@ function ImageFlow ()
 			scrollbarDiv.appendChild(buttonPreviousDiv);
 			scrollbarDiv.appendChild(buttonNextDiv);
 		}
-		
+
 		/* Create navigation div container beneath images div */
 		var navigationDiv = my.Helper.createDocumentElement('div','navigation');
 		navigationDiv.appendChild(captionDiv);
@@ -266,7 +276,7 @@ function ImageFlow ()
 		return success;
 	};
 
-	
+
 	/* Manage loading progress and call the refresh function */
 	this.loadingProgress = function()
 	{
@@ -295,7 +305,7 @@ function ImageFlow ()
 
 			/* Call refresh once on startup to display images */
 			my.refresh();
-			
+
 			/* Only initialize navigation elements if there is more than one image */
 			if(my.max > 1)
 			{
@@ -310,7 +320,7 @@ function ImageFlow ()
 				{
 					my.Slideshow.init();
 				}
-				
+
 				/* Toggle scrollbar visibility */
 				if(my.slider)
 				{
@@ -339,7 +349,7 @@ function ImageFlow ()
 				i++;
 			}
 		}
-		
+
 		var finished = Math.round((completed/i)*100);
 		var loadingBar = document.getElementById(my.ImageFlowID+'_loading_bar');
 		loadingBar.style.width = finished+'%';
@@ -350,14 +360,14 @@ function ImageFlow ()
 			i = i - (my.imageFocusMax*2);
 			completed = (finished < 1) ? 0 : Math.round((i/100)*finished);
 		}
-		
+
 		var loadingP = document.getElementById(my.ImageFlowID+'_loading_txt');
 		var loadingTxt = document.createTextNode('loading images '+completed+'/'+i);
 		loadingP.replaceChild(loadingTxt,loadingP.firstChild);
 		return finished;
 	};
 
-	
+
 	/* Cache EVERYTHING that only changes on refresh or resize of the window */
 	this.refresh = function()
 	{
@@ -369,7 +379,7 @@ function ImageFlow ()
 		this.sliderWidth = my.sliderWidth * 0.5;
 		this.scrollbarWidth = (my.imagesDivWidth - ( Math.round(my.sliderWidth) * 2)) * my.scrollbarP;
 		this.imagesDivHeight = Math.round(my.maxHeight * my.imagesHeight);
-		
+
 		/* Change imageflow div properties */
 		my.ImageFlowDiv.style.height = my.maxHeight + 'px';
 
@@ -391,7 +401,7 @@ function ImageFlow ()
 		/* Set slider attributes */
 		my.sliderDiv.style.cursor = my.sliderCursor;
 		my.sliderDiv.onmousedown = function () { my.MouseDrag.start(this); return false;};
-		
+
 		if(my.buttons)
 		{
 			my.buttonPreviousDiv.onclick = function () { my.MouseWheel.handle(1); };
@@ -447,7 +457,7 @@ function ImageFlow ()
 				
 				/* Change image positioning */
 				if(my.imageScaling === false)
-				{		
+				{
 					image.style.position = 'relative';
 					image.style.display = 'inline';
 				}
@@ -458,16 +468,16 @@ function ImageFlow ()
 			}
 		}
 		this.max = my.indexArray.length;
-		
+
 		/* Override dynamic sizes based on the first image */
 		if(my.imageScaling === false)
 		{
 			image = my.imagesDiv.childNodes[my.indexArray[0]];
-			
+
 			/* Set left padding for the first image */
 			this.totalImagesWidth = image.w * my.max;
 			image.style.paddingLeft = (my.imagesDivWidth/2) + (image.w/2) + 'px';
-			
+
 			/* Override images and navigation div height */
 			my.imagesDiv.style.height =  image.h + 'px';
 			my.navigationDiv.style.height =  (my.maxHeight - image.h) + 'px'; 
@@ -478,33 +488,33 @@ function ImageFlow ()
 		{
 			/* Reset variable */
 			my.firstRefresh = false;
-		
+
 			/* Set imageID to the startID */
 			my.imageID = my.startID-1;
 			if (my.imageID < 0 )
 			{
 				my.imageID = 0;
 			}
-			
+
 			/* Map image id range in cicular mode (ignore the cloned images) */
 			if(my.circular)
 			{	
 				my.imageID = my.imageID + my.imageFocusMax;
 			}
-			
+
 			/* Make sure, that the id is smaller than the image count  */
 			maxId = (my.circular) ?  (my.max-(my.imageFocusMax))-1 : my.max-1;
 			if (my.imageID > maxId)
 			{
 				my.imageID = maxId;
 			}
-			
+
 			/* Toggle glide animation to start ID */
 			if(my.glideToStartID === false)
-			{	
+			{
 				my.moveTo(-my.imageID * my.xStep);
 			}
-			
+
 			/* Animate images moving in from the right */
 			if(my.startAnimation)
 			{
@@ -517,7 +527,7 @@ function ImageFlow ()
 		{
 			my.glideTo(my.imageID);
 		}
-		
+
 		/* Display images in current order */
 		my.moveTo(my.current);
 	};
@@ -643,7 +653,7 @@ function ImageFlow ()
 		}
 	};
 
-	
+
 	/* Initializes image gliding animation */
 	this.glideTo = function(imageID)
 	{
@@ -661,7 +671,7 @@ function ImageFlow ()
 				/* Set the imageID to the last image */
 				imageID = clonedImageID-1 ;
 			}
-			
+
 			/* Trigger right jumppoint */
 			if(imageID === (my.max - my.imageFocusMax))
 			{
@@ -741,7 +751,7 @@ function ImageFlow ()
 				}
 			}
 		}
-		
+
 		/* Move the images to the jump target */
 		if(jumpTarget)
 		{
@@ -752,7 +762,7 @@ function ImageFlow ()
 		if (my.busy === false)
 		{
 			my.busy = true;
-			my.animate();			
+			my.animate();
 		}
 	};
 
@@ -774,7 +784,7 @@ function ImageFlow ()
 		}
 	};
 
-	
+
 	/* Used by user events to call the glideTo function */
 	this.glideOnEvent = function(imageID)
 	{
@@ -787,8 +797,8 @@ function ImageFlow ()
 		/* Glide to new imageID */
 		my.glideTo(imageID);
 	};
-	
-	
+
+
 	/* Slideshow function */
 	this.Slideshow =
 	{
@@ -799,7 +809,7 @@ function ImageFlow ()
 			/* Call start() if autoplay is enabled, stop() if it is disabled */
 			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();	
 		},
-		
+
 		interrupt: function()
 		{	
 			/* Remove interrupt event */
@@ -808,13 +818,13 @@ function ImageFlow ()
 			/* Interrupt the slideshow */
 			my.Slideshow.stop();
 		},
-		
+
 		addInterruptEvent: function()
 		{
 			/* A click anywhere inside the ImageFlow div interrupts the slideshow */
 			my.Helper.addEvent(my.ImageFlowDiv,'click',my.Slideshow.interrupt);
 		},
-		
+
 		start: function()
 		{
 			/* Set button style to pause */
@@ -822,14 +832,14 @@ function ImageFlow ()
 
 			/* Set onclick behaviour to stop */
 			my.buttonSlideshow.onclick = function () { my.Slideshow.stop(); };
-			
+
 			/* Set slide interval */
 			my.Slideshow.action = window.setInterval(my.Slideshow.slide, my.slideshowSpeed);
-			
+
 			/* Allow the user to always interrupt the slideshow */
 			window.setTimeout(my.Slideshow.addInterruptEvent, 100);
 		},
-		
+
 		stop: function()
 		{
 			/* Set button style to play */
@@ -841,7 +851,7 @@ function ImageFlow ()
 			/* Clear slide interval */
 			window.clearInterval(my.Slideshow.action);
 		},
-		
+
 		slide: function()
 		{
 			var newImageID = my.imageID + my.Slideshow.direction;
@@ -851,7 +861,7 @@ function ImageFlow ()
 			if(newImageID === my.max)
 			{
 				my.Slideshow.direction = -1;
-				reverseDirection = true;				
+				reverseDirection = true;
 			}
 			
 			/* Reverse direction at the last image on the left */
@@ -866,7 +876,7 @@ function ImageFlow ()
 		}
 	};
 
-	
+
 	/* Mouse Wheel support */
 	this.MouseWheel =
 	{
@@ -930,8 +940,8 @@ function ImageFlow ()
 			}
 		}
 	};
-	
-	
+
+
 	/* Mouse Dragging */
 	this.MouseDrag =
 	{
@@ -1007,7 +1017,7 @@ function ImageFlow ()
 				var step, imageID;
 				if(my.circular)
 				{
-					step = (newX + my.newSliderX) / (my.scrollbarWidth / (my.max-(my.imageFocusMax*2))+2);
+					step = (newX + my.newSliderX) / (my.scrollbarWidth / (my.max-(my.imageFocusMax*2)-1));
 					imageID = Math.round(step)+my.imageFocusMax;
 				}
 				else
@@ -1025,12 +1035,12 @@ function ImageFlow ()
 			}
 		}
 	};
-	
-	
+
+
 	/* Safari touch events on the iPhone and iPod Touch */
 	this.Touch =
 	{
-		x: 0,		
+		x: 0,
 		startX: 0,
 		stopX: 0,
 		busy: false,
@@ -1045,7 +1055,7 @@ function ImageFlow ()
 		},
 		
 		isOnNavigationDiv: function(e)
-		{	
+		{
 			var state = false;
 			if(e.touches)
 			{
@@ -1057,7 +1067,7 @@ function ImageFlow ()
 			}
 			return state;
 		},
-		
+
 		getX: function(e)
 		{
 			var x = 0;
@@ -1065,16 +1075,16 @@ function ImageFlow ()
 			{
 				x = e.touches[0].pageX;
 			}
-			return x;		
+			return x;
 		},
-	
+
 		start: function(e)
 		{
 			my.Touch.startX = my.Touch.getX(e);
 			my.Touch.busy = true;
-			my.Helper.suppressBrowserDefault(e);			
+			my.Helper.suppressBrowserDefault(e);
 		},
-		
+
 		isBusy: function()
 		{
 			var busy = false;
@@ -1130,7 +1140,7 @@ function ImageFlow ()
 			my.Touch.busy = false;
 		}
 	};
-	
+
 
 	/* Key support */
 	this.Key =
@@ -1166,8 +1176,8 @@ function ImageFlow ()
 			return event.keyCode;
 		}
 	};
-	
-	
+
+
 	/* Helper functions */
 	this.Helper =
 	{
@@ -1185,7 +1195,7 @@ function ImageFlow ()
 				obj.attachEvent( "on"+type, obj[type+fn] );
 			}
 		},
-		
+
 		/* Remove events */
 		removeEvent: function( obj, type, fn )
 		{
@@ -1205,7 +1215,7 @@ function ImageFlow ()
 				obj['e'+type+fn] = null;
 			}
 		},
-		
+
 		/* Set image opacity */
 		setOpacity: function(object, value)
 		{
@@ -1215,7 +1225,7 @@ function ImageFlow ()
 				object.style.filter = 'alpha(opacity=' + value*10 + ')';
 			}
 		},
-		
+
 		/* Create HTML elements */
 		createDocumentElement: function(type, id, optionalClass)
 		{
@@ -1228,7 +1238,7 @@ function ImageFlow ()
 			my.Helper.setClassName(element, id);
 			return element;
 		},
-		
+
 		/* Set CSS class */
 		setClassName: function(element, className)
 		{
@@ -1238,7 +1248,7 @@ function ImageFlow ()
 				element.setAttribute('className', className);
 			}
 		},
-		
+
 		/* Suppress default browser behaviour to avoid image/text selection while dragging */
 		suppressBrowserDefault: function(e)
 		{
@@ -1252,7 +1262,7 @@ function ImageFlow ()
 			}
 			return false;
 		},
-		
+
 		/* Add functions to the window.onresize event - can not be done by addEvent */
 		addResizeEvent: function()
 		{
