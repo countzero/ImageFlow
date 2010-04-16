@@ -153,6 +153,7 @@ function ImageFlow ()
 		/* Shift all images into the images div */
 		var node, version, src, imageNode;
 		var max = my.ImageFlowDiv.childNodes.length;
+		var maxCorrected = max;
 		for(var index = 0; index < max; index++)
 		{
 			node = my.ImageFlowDiv.childNodes[index];
@@ -167,7 +168,7 @@ function ImageFlow ()
 					}
 					else
 					{
-						max--;
+						maxCorrected--;
 						continue;
 					}
 				}
@@ -185,7 +186,12 @@ function ImageFlow ()
 				imageNode = node.cloneNode(true);
 				imagesDiv.appendChild(imageNode);
 			}
+			else
+			{
+				maxCorrected--;
+			}
 		}
+		max = maxCorrected;
 
 		/* Randomize the children of imagesDiv */
 		if (my.randomize && max > 1)
@@ -1419,11 +1425,11 @@ function ImageFlow ()
 				}
 			}
 			/* collect caption and href and push it back to the imgNode */
-			if (caption)
+			if (caption && imgNode)
 			{
 				imgNode.setAttribute('alt', caption);
 			}
-			if (linkURL)
+			if (linkURL && imgNode)
 			{
 				imgNode.setAttribute('longdesc', linkURL);
 			}
