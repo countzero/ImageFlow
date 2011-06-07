@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
 Name:       ImageFlow
 Version:    1.3.0 (March 9 2010)
 Author:     Finn Rudolph
@@ -49,12 +49,13 @@ function ImageFlow ()
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
 		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
 		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
-		imageScaling:       true,           /* Toggle image scaling */ 
+		imageScaling:       true,           /* Toggle image scaling */
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
 		imagesM:            1.0,            /* Multiplicator for all images in percent */
 		onClick:            function() { document.location = this.url; },   /* Onclick behaviour */
 		opacity:            false,          /* Toggle image opacity */
 		opacityArray:       [10,8,6,4,2],   /* Image opacity (range: 0 to 10) first value is for the focussed image */
+		orientation:		'bottom',		/* Vertical Image orientation - default is bottom (bottom,middle,top)*/
 		percentLandscape:   118,            /* Scale landscape format */
 		percentOther:       100,            /* Scale portrait and square format */
 		preloadImages:      true,           /* Toggles loading bar (false: requires img attributes height and width) */
@@ -85,7 +86,7 @@ function ImageFlow ()
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		for(var name in my.defaults) 
+		for(var name in my.defaults)
 		{
 			this[name] = (options !== undefined && options[name] !== undefined) ? options[name] : my.defaults[name];
 		}
@@ -167,7 +168,7 @@ function ImageFlow ()
 			/* Create temporary elements to hold the cloned images */
 			var first = my.Helper.createDocumentElement('div','images');
 			var last = my.Helper.createDocumentElement('div','images');
-			
+
 			/* Make sure, that there are enough images to use circular mode */
 			max = imagesDiv.childNodes.length;
 			if(max < my.imageFocusMax)
@@ -209,7 +210,7 @@ function ImageFlow ()
 					imageNode = node.cloneNode(true);
 					last.appendChild(imageNode);
 				}
-				
+
 				/* Overwrite the imagesDiv with the new order */
 				imagesDiv = last;
 			}
@@ -253,7 +254,7 @@ function ImageFlow ()
 		var navigationDiv = my.Helper.createDocumentElement('div','navigation');
 		navigationDiv.appendChild(captionDiv);
 		navigationDiv.appendChild(scrollbarDiv);
-	
+
 		/* Update document structure and return true on success */
 		var success = false;
 		if (my.ImageFlowDiv.appendChild(imagesDiv) &&
@@ -314,7 +315,7 @@ function ImageFlow ()
 				my.MouseDrag.init();
 				my.Touch.init();
 				my.Key.init();
-				
+
 				/* Toggle slideshow */
 				if(my.slideshow)
 				{
@@ -384,10 +385,10 @@ function ImageFlow ()
 		my.ImageFlowDiv.style.height = my.maxHeight + 'px';
 
 		/* Change images div properties */
-		my.imagesDiv.style.height =  my.imagesDivHeight + 'px'; 
-		
+		my.imagesDiv.style.height =  my.imagesDivHeight + 'px';
+
 		/* Change images div properties */
-		my.navigationDiv.style.height =  (my.maxHeight - my.imagesDivHeight) + 'px'; 
+		my.navigationDiv.style.height =  (my.maxHeight - my.imagesDivHeight) + 'px';
 
 		/* Change captions div properties */
 		my.captionDiv.style.width = my.imagesDivWidth + 'px';
@@ -454,7 +455,7 @@ function ImageFlow ()
 					image.pc = my.percentOther;
 					image.pcMem = my.percentOther;
 				}
-				
+
 				/* Change image positioning */
 				if(my.imageScaling === false)
 				{
@@ -480,7 +481,7 @@ function ImageFlow ()
 
 			/* Override images and navigation div height */
 			my.imagesDiv.style.height =  image.h + 'px';
-			my.navigationDiv.style.height =  (my.maxHeight - image.h) + 'px'; 
+			my.navigationDiv.style.height =  (my.maxHeight - image.h) + 'px';
 		}
 
 		/* Handle startID on the first refresh */
@@ -498,7 +499,7 @@ function ImageFlow ()
 
 			/* Map image id range in cicular mode (ignore the cloned images) */
 			if(my.circular)
-			{	
+			{
 				my.imageID = my.imageID + my.imageFocusMax;
 			}
 
@@ -579,6 +580,20 @@ function ImageFlow ()
 
 					var newImageTop = (my.imagesDivHeight - newImageH) + ((newImageH / (my.reflectionP + 1)) * my.reflectionP);
 
+					switch (my.orientation)
+					{
+						case 'top': //ToDo
+							break;
+
+						case 'middle': //ToDo: untestet with Reflections, guess it will need adjustment
+							newImageTop -= (image.h - newImageH)/2;
+							break;
+
+						default: //bottom, do nothing
+							break;
+					}
+
+
 					/* Set new image properties */
 					image.style.left = xs - (image.pc / 2) / z * my.size + 'px';
 					if(newImageW && newImageH)
@@ -645,7 +660,7 @@ function ImageFlow ()
 							}
 							break;
 					}
-				}	
+				}
 				my.imagesDiv.style.marginLeft = (x - my.totalImagesWidth) + 'px';
 			}
 
@@ -678,7 +693,7 @@ function ImageFlow ()
 				/* Set jump target to the same cloned image on the left */
 				clonedImageID = my.imageFocusMax-1;
 				jumpTarget = -clonedImageID * my.xStep;
-				
+
 				/* Set the imageID to the first image */
 				imageID = clonedImageID+1;
 			}
@@ -793,7 +808,7 @@ function ImageFlow ()
 		{
 			my.Slideshow.interrupt();
 		}
-		
+
 		/* Glide to new imageID */
 		my.glideTo(imageID);
 	};
@@ -803,18 +818,18 @@ function ImageFlow ()
 	this.Slideshow =
 	{
 		direction: 1,
-		
+
 		init: function()
 		{
 			/* Call start() if autoplay is enabled, stop() if it is disabled */
-			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();	
+			(my.slideshowAutoplay) ? my.Slideshow.start() : my.Slideshow.stop();
 		},
 
 		interrupt: function()
-		{	
+		{
 			/* Remove interrupt event */
 			my.Helper.removeEvent(my.ImageFlowDiv,'click',my.Slideshow.interrupt);
-			
+
 			/* Interrupt the slideshow */
 			my.Slideshow.stop();
 		},
@@ -844,10 +859,10 @@ function ImageFlow ()
 		{
 			/* Set button style to play */
 			my.Helper.setClassName(my.buttonSlideshow, 'slideshow play');
-			
+
 			/* Set onclick behaviour to start */
 			my.buttonSlideshow.onclick = function () { my.Slideshow.start(); };
-			
+
 			/* Clear slide interval */
 			window.clearInterval(my.Slideshow.action);
 		},
@@ -856,21 +871,21 @@ function ImageFlow ()
 		{
 			var newImageID = my.imageID + my.Slideshow.direction;
 			var reverseDirection = false;
-			
+
 			/* Reverse direction at the last image on the right */
 			if(newImageID === my.max)
 			{
 				my.Slideshow.direction = -1;
 				reverseDirection = true;
 			}
-			
+
 			/* Reverse direction at the last image on the left */
 			if(newImageID < 0)
 			{
 				my.Slideshow.direction = 1;
 				reverseDirection = true;
 			}
-			
+
 			/* If direction is reversed recall this method, else call the glideTo method */
 			(reverseDirection) ? my.Slideshow.slide() : my.glideTo(newImageID);
 		}
@@ -1051,9 +1066,9 @@ function ImageFlow ()
 		{
 			my.Helper.addEvent(my.navigationDiv,'touchstart',my.Touch.start);
 			my.Helper.addEvent(document,'touchmove',my.Touch.handle);
-			my.Helper.addEvent(document,'touchend',my.Touch.stop);	
+			my.Helper.addEvent(document,'touchend',my.Touch.stop);
 		},
-		
+
 		isOnNavigationDiv: function(e)
 		{
 			var state = false;
@@ -1119,7 +1134,7 @@ function ImageFlow ()
 				}
 
 				my.Touch.x = newX;
-				
+
 				var imageID = Math.round(newX / (my.imagesDivWidth / max));
 				imageID = max - imageID;
 				if(my.imageID !== imageID)
