@@ -44,6 +44,7 @@ function ImageFlow ()
 		buttons:            false,          /* Toggle navigation buttons */
 		buttonsCustom:		false,			/* if custom buttons */
 		captions:           true,           /* Toggle captions */
+		captionsPaddingTop: false,			/* Set fixed Pixel value, if false it will be calculated */
 		captionsAfterScrollbar: false,      /* Toggle to show captions after scrollbar */
 		circular:           false,          /* Toggle circular rotation */
 		counter:            false,          /* Toggle counter creation; will be only created if a div with id="[ImageFlowID]_counter" is there as well */
@@ -474,7 +475,12 @@ function ImageFlow ()
 
 		/* Change captions div properties */
 		my.captionDiv.style.width = my.imagesDivWidth + 'px';
-		my.captionDiv.style.paddingTop = Math.round(my.imagesDivWidth * 0.02) + 'px';
+
+		if(my.captionsPaddingTop){
+			my.captionDiv.style.paddingTop =  my.captionsPaddingTop + 'px';
+		}else{
+			my.captionDiv.style.paddingTop = Math.round(my.imagesDivWidth * 0.02) + 'px';
+		}
 
 		/* Change scrollbar div properties */
 		my.scrollbarDiv.style.width = my.scrollbarWidth + 'px';
