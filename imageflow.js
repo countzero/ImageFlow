@@ -42,21 +42,17 @@ function ImageFlow ()
 		animationSpeed:     50,             /* Animation speed in ms */
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
 		buttons:            false,          /* Toggle navigation buttons */
+		buttonsCustom:		false,			/* if custom buttons */
 		captions:           true,           /* Toggle captions */
 		captionsAfterScrollbar: false,      /* Toggle to show captions after scrollbar */
 		circular:           false,          /* Toggle circular rotation */
 		counter:            false,          /* Toggle counter creation; will be only created if a div with id="[ImageFlowID]_counter" is there as well */
 		counterTxtPrepend:  'Image ',       /* Text to prepend counter */
-		counterTxtOf:       ' of ',         /* Text for counter between current iamge number and total amount of images */
+		counterTxtOf:       ' of ',         /* Text for counter between current image number and total amount of images */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
 		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
-		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
-		imageScaling:       true,           /* Toggle image scaling */ 
-		imagesHeight:       0.67,           /* Height of the images div container in percent */
-		imagesM:            1.0,            /* Multiplicator for all images in percent */
-		onClick:            function() { document.location = this.url; },   /* Onclick behaviour */
 		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
 		imageScaling:       true,           /* Toggle image scaling */
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
@@ -99,7 +95,7 @@ function ImageFlow ()
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		for(var name in my.defaults) 
+		for(var name in my.defaults)
 		{
 			this[name] = (options !== undefined && options[name] !== undefined) ? options[name] : my.defaults[name];
 		}
@@ -115,14 +111,14 @@ function ImageFlow ()
 			/* Try to create XHTML structure */
 			if(this.createStructure())
 			{
-				this.imagesDiv = document.getElementById(my.ImageFlowID+'_images');
-				this.captionDiv = document.getElementById(my.ImageFlowID+'_caption');
-				this.navigationDiv = document.getElementById(my.ImageFlowID+'_navigation');
-				this.scrollbarDiv = document.getElementById(my.ImageFlowID+'_scrollbar');
-				this.sliderDiv = document.getElementById(my.ImageFlowID+'_slider');
-				this.buttonNextDiv = document.getElementById(my.ImageFlowID+'_next');
-				this.buttonPreviousDiv = document.getElementById(my.ImageFlowID+'_previous');
-				this.buttonSlideshow = document.getElementById(my.ImageFlowID+'_slideshow');
+				this.imagesDiv 			= document.getElementById(my.ImageFlowID+'_images');
+				this.captionDiv 		= document.getElementById(my.ImageFlowID+'_caption');
+				this.navigationDiv 		= document.getElementById(my.ImageFlowID+'_navigation');
+				this.scrollbarDiv 		= document.getElementById(my.ImageFlowID+'_scrollbar');
+				this.sliderDiv 			= document.getElementById(my.ImageFlowID+'_slider');
+				this.buttonNextDiv 		= document.getElementById(my.ImageFlowID+'_next');
+				this.buttonPreviousDiv 	= document.getElementById(my.ImageFlowID+'_previous');
+				this.buttonSlideshow	= document.getElementById(my.ImageFlowID+'_slideshow');
 				if (this.counter)
 				{
 					this.counterP =  document.getElementById(my.ImageFlowID+'_counter_txt');
@@ -225,7 +221,7 @@ function ImageFlow ()
 			/* Create temporary elements to hold the cloned images */
 			var first = my.Helper.createDocumentElement('div','images');
 			var last = my.Helper.createDocumentElement('div','images');
-			
+
 			/* Make sure, that there are enough images to use circular mode */
 			max = imagesDiv.childNodes.length;
 			if(max < my.imageFocusMax)
@@ -267,7 +263,7 @@ function ImageFlow ()
 					imageNode = node.cloneNode(true);
 					last.appendChild(imageNode);
 				}
-				
+
 				/* Overwrite the imagesDiv with the new order */
 				imagesDiv = last;
 			}
@@ -301,10 +297,14 @@ function ImageFlow ()
 		scrollbarDiv.appendChild(sliderDiv);
 		if (my.buttons)
 		{
-			var buttonPreviousDiv = my.Helper.createDocumentElement('div','previous', 'button');
-			var buttonNextDiv = my.Helper.createDocumentElement('div','next', 'button');
-			scrollbarDiv.appendChild(buttonPreviousDiv);
-			scrollbarDiv.appendChild(buttonNextDiv);
+			if(my.buttonsCustom){
+				/* custom buttons, give them id my.ImageFlowID+'_next' or 'previous'*/
+			}else {
+				var buttonNextDiv = my.Helper.createDocumentElement('div','next', 'button');
+				var buttonPreviousDiv = my.Helper.createDocumentElement('div','previous', 'button');
+				scrollbarDiv.appendChild(buttonNextDiv);
+				scrollbarDiv.appendChild(buttonPreviousDiv);
+			}
 		}
 
 		/* Create counter if configured, in template and max > 1 */
@@ -467,7 +467,7 @@ function ImageFlow ()
 		my.ImageFlowDiv.style.height = my.maxHeight + 'px';
 
 		/* Change images div properties */
-		my.imagesDiv.style.height =  my.imagesDivHeight + 'px';
+		my.imagesDiv.style.height =  Math.round(my.imagesDivHeight+0.5) + 'px';
 
 		/* Change images div properties */
 		my.navigationDiv.style.height =  (my.maxHeight - my.imagesDivHeight) + 'px';
@@ -680,8 +680,8 @@ function ImageFlow ()
 					image.style.left = xs - (image.pc / 2) / z * my.size + 'px';
 					if(newImageW && newImageH)
 					{
-						image.style.height = newImageH + 'px';
-						image.style.width = newImageW + 'px';
+						image.style.height = Math.round(0.5+newImageH) + 'px';
+						image.style.width = Math.round(0.5+newImageW) + 'px';
 						image.style.top = newImageTop + 'px';
 					}
 					image.style.visibility = 'visible';
@@ -802,13 +802,15 @@ function ImageFlow ()
 		/* Display new counter, if set */
 		if (my.counter)
 		{
+			var counterTxt;
+
 			if (my.circular)
 			{
-				var counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID-my.imageFocusMax+1) + my.counterTxtOf + (my.max-(my.imageFocusMax*2)));
+				counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID-my.imageFocusMax+1) + my.counterTxtOf + (my.max-(my.imageFocusMax*2)));
 			}
 			else
 			{
-				var counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID+1) + my.counterTxtOf + my.max);
+				counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID+1) + my.counterTxtOf + my.max);
 			}
 			my.counterP.replaceChild(counterTxt, my.counterP.firstChild);
 		}
