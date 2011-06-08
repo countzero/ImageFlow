@@ -1,4 +1,4 @@
-﻿﻿/*
+/*
 Name:       ImageFlow
 Version:    1.3.0 (March 9 2010)
 Author:     Finn Rudolph
@@ -43,11 +43,20 @@ function ImageFlow ()
 		aspectRatio:        1.964,          /* Aspect ratio of the ImageFlow container (width divided by height) */
 		buttons:            false,          /* Toggle navigation buttons */
 		captions:           true,           /* Toggle captions */
+		captionsAfterScrollbar: false,      /* Toggle to show captions after scrollbar */
 		circular:           false,          /* Toggle circular rotation */
+		counter:            false,          /* Toggle counter creation; will be only created if a div with id="[ImageFlowID]_counter" is there as well */
+		counterTxtPrepend:  'Image ',       /* Text to prepend counter */
+		counterTxtOf:       ' of ',         /* Text for counter between current iamge number and total amount of images */
 		imageCursor:        'default',      /* Cursor type for all images - default is 'default' */
 		ImageFlowID:        'imageflow',    /* Default id of the ImageFlow container */
 		imageFocusM:        1.0,            /* Multiplicator for the focussed image size in percent */
 		imageFocusMax:      4,              /* Max number of images on each side of the focussed one */
+		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
+		imageScaling:       true,           /* Toggle image scaling */ 
+		imagesHeight:       0.67,           /* Height of the images div container in percent */
+		imagesM:            1.0,            /* Multiplicator for all images in percent */
+		onClick:            function() { document.location = this.url; },   /* Onclick behaviour */
 		imagePath:          '',             /* Path to the images relative to the reflect_.php script */
 		imageScaling:       true,           /* Toggle image scaling */
 		imagesHeight:       0.67,           /* Height of the images div container in percent */
@@ -59,18 +68,22 @@ function ImageFlow ()
 		percentLandscape:   118,            /* Scale landscape format */
 		percentOther:       100,            /* Scale portrait and square format */
 		preloadImages:      true,           /* Toggles loading bar (false: requires img attributes height and width) */
+		preloadImagesTxt:   'loading images', /* Text to be prepended within the loading bar */
+		randomize:          false,          /* Toggles random shuffling of the images on each visit */
 		reflections:        true,           /* Toggle reflections */
 		reflectionGET:      '',             /* Pass variables via the GET method to the reflect_.php script */
 		reflectionP:        0.5,            /* Height of the reflection in percent of the source image */
 		reflectionPNG:      false,          /* Toggle reflect2.php or reflect3.php */
 		reflectPath:        '',             /* Path to the reflect_.php script */
 		scrollbarP:         0.6,            /* Width of the scrollbar in percent */
+		singleItemTag:      'IMG',          /* Tagname representing a single item, enables HTML source parsing for hrefs and captions as well (default IMG, can be set e.g. to LI if images are grouped within a list)*/
 		slider:             true,           /* Toggle slider */
 		sliderCursor:       'e-resize',     /* Slider cursor type - default is 'default' */
 		sliderWidth:        14,             /* Width of the slider in px */
 		slideshow:          false,          /* Toggle slideshow */
 		slideshowSpeed:     1500,           /* Time between slides in ms */
 		slideshowAutoplay:  false,          /* Toggle automatic slideshow play on startup */
+		slideshowAutoplayOnce: false,       /* Toggle autoplay to stop after one circle if both slideshowAutoplay and circular are enabled */
 		startID:            1,              /* Image ID to begin with */
 		glideToStartID:     true,           /* Toggle glide animation to start ID */
 		startAnimation:     false,          /* Animate images moving in from the right on startup */
@@ -86,7 +99,7 @@ function ImageFlow ()
 	this.init = function (options)
 	{
 		/* Evaluate options */
-		for(var name in my.defaults)
+		for(var name in my.defaults) 
 		{
 			this[name] = (options !== undefined && options[name] !== undefined) ? options[name] : my.defaults[name];
 		}
@@ -110,6 +123,10 @@ function ImageFlow ()
 				this.buttonNextDiv = document.getElementById(my.ImageFlowID+'_next');
 				this.buttonPreviousDiv = document.getElementById(my.ImageFlowID+'_previous');
 				this.buttonSlideshow = document.getElementById(my.ImageFlowID+'_slideshow');
+				if (this.counter)
+				{
+					this.counterP =  document.getElementById(my.ImageFlowID+'_counter_txt');
+				}
 
 				this.indexArray = [];
 				this.current = 0;
@@ -142,11 +159,26 @@ function ImageFlow ()
 		/* Shift all images into the images div */
 		var node, version, src, imageNode;
 		var max = my.ImageFlowDiv.childNodes.length;
+		var maxCorrected = max;
 		for(var index = 0; index < max; index++)
 		{
 			node = my.ImageFlowDiv.childNodes[index];
-			if (node && node.nodeType == 1 && node.nodeName == 'IMG')
+			if (node && node.nodeType == 1 && node.nodeName == my.singleItemTag)
 			{
+				if (my.singleItemTag != 'IMG')
+				{
+					var imgNode = my.Helper.getImagesFromStructure(node);
+					if (imgNode)
+					{
+						node = imgNode;
+					}
+					else
+					{
+						maxCorrected--;
+						continue;
+					}
+				}
+
 				/* Add 'reflect.php?img=' */
 				if(my.reflections === true)
 				{
@@ -160,6 +192,31 @@ function ImageFlow ()
 				imageNode = node.cloneNode(true);
 				imagesDiv.appendChild(imageNode);
 			}
+			else
+			{
+				maxCorrected--;
+			}
+		}
+		max = maxCorrected;
+
+		/* Randomize the children of imagesDiv */
+		if (my.randomize && max > 1)
+		{
+			var randomizedImages = my.Helper.createDocumentElement('div','images');
+			while(imagesDiv.hasChildNodes()) {
+				var rand = Math.floor(imagesDiv.childNodes.length * Math.random());
+				node = imagesDiv.childNodes[rand];
+				var randNode = node.cloneNode(true);
+				randomizedImages.appendChild(randNode);
+				imagesDiv.removeChild(node);
+			}
+			imagesDiv = randomizedImages;
+		}
+
+		/* unset circular if less than 2 images */
+		if (max < 2)
+		{
+			my.circular = false;
 		}
 
 		/* Clone some more images to make a circular animation possible */
@@ -168,7 +225,7 @@ function ImageFlow ()
 			/* Create temporary elements to hold the cloned images */
 			var first = my.Helper.createDocumentElement('div','images');
 			var last = my.Helper.createDocumentElement('div','images');
-
+			
 			/* Make sure, that there are enough images to use circular mode */
 			max = imagesDiv.childNodes.length;
 			if(max < my.imageFocusMax)
@@ -210,7 +267,7 @@ function ImageFlow ()
 					imageNode = node.cloneNode(true);
 					last.appendChild(imageNode);
 				}
-
+				
 				/* Overwrite the imagesDiv with the new order */
 				imagesDiv = last;
 			}
@@ -242,7 +299,7 @@ function ImageFlow ()
 		var scrollbarDiv = my.Helper.createDocumentElement('div','scrollbar');
 		var sliderDiv = my.Helper.createDocumentElement('div','slider');
 		scrollbarDiv.appendChild(sliderDiv);
-		if(my.buttons)
+		if (my.buttons)
 		{
 			var buttonPreviousDiv = my.Helper.createDocumentElement('div','previous', 'button');
 			var buttonNextDiv = my.Helper.createDocumentElement('div','next', 'button');
@@ -250,10 +307,35 @@ function ImageFlow ()
 			scrollbarDiv.appendChild(buttonNextDiv);
 		}
 
+		/* Create counter if configured, in template and max > 1 */
+		if (my.counter)
+		{
+			var counterDiv = document.getElementById(my.ImageFlowID+'_counter');
+			if (counterDiv && max > 1)
+			{
+				var counterP = my.Helper.createDocumentElement('p','counter_txt');
+				var counterText = document.createTextNode(' ');
+				counterP.appendChild(counterText);
+				counterDiv.appendChild(counterP);
+			}
+			else
+			{
+				my.counter = false;
+			}
+		}
+
 		/* Create navigation div container beneath images div */
 		var navigationDiv = my.Helper.createDocumentElement('div','navigation');
-		navigationDiv.appendChild(captionDiv);
-		navigationDiv.appendChild(scrollbarDiv);
+		if (my.captionsAfterScrollbar)
+		{
+			navigationDiv.appendChild(scrollbarDiv);
+			navigationDiv.appendChild(captionDiv);
+		}
+		else
+		{
+			navigationDiv.appendChild(captionDiv);
+			navigationDiv.appendChild(scrollbarDiv);
+		}
 
 		/* Update document structure and return true on success */
 		var success = false;
@@ -363,7 +445,7 @@ function ImageFlow ()
 		}
 
 		var loadingP = document.getElementById(my.ImageFlowID+'_loading_txt');
-		var loadingTxt = document.createTextNode('loading images '+completed+'/'+i);
+		var loadingTxt = document.createTextNode(my.preloadImagesTxt+' '+completed+'/'+i);
 		loadingP.replaceChild(loadingTxt,loadingP.firstChild);
 		return finished;
 	};
@@ -504,7 +586,7 @@ function ImageFlow ()
 			}
 
 			/* Make sure, that the id is smaller than the image count  */
-			maxId = (my.circular) ?  (my.max-(my.imageFocusMax))-1 : my.max-1;
+			var maxId = (my.circular) ?  (my.max-(my.imageFocusMax))-1 : my.max-1;
 			if (my.imageID > maxId)
 			{
 				my.imageID = maxId;
@@ -523,8 +605,8 @@ function ImageFlow ()
 			}
 		}
 
-		/* Only animate if there is more than one image */
-		if(my.max > 1)
+		/* Only animate if there is at least one image */
+		if(my.max > 0)
 		{
 			my.glideTo(my.imageID);
 		}
@@ -697,6 +779,10 @@ function ImageFlow ()
 				/* Set the imageID to the first image */
 				imageID = clonedImageID+1;
 			}
+			if(imageID === (my.max - my.imageFocusMax - 1) && my.slideshowAutoplay && my.slideshowAutoplayOnce)
+			{
+				my.Slideshow.stop();
+			}
 		}
 
 		/* Calculate new image position target */
@@ -713,8 +799,22 @@ function ImageFlow ()
 		}
 		my.captionDiv.innerHTML = caption;
 
+		/* Display new counter, if set */
+		if (my.counter)
+		{
+			if (my.circular)
+			{
+				var counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID-my.imageFocusMax+1) + my.counterTxtOf + (my.max-(my.imageFocusMax*2)));
+			}
+			else
+			{
+				var counterTxt = document.createTextNode(my.counterTxtPrepend + (imageID+1) + my.counterTxtOf + my.max);
+			}
+			my.counterP.replaceChild(counterTxt, my.counterP.firstChild);
+		}
+
 		/* Set scrollbar slider to new position */
-		if (my.MouseDrag.busy === false)
+		if (my.MouseDrag.busy === false && my.max > 1)
 		{
 			if(my.circular)
 			{
@@ -732,7 +832,7 @@ function ImageFlow ()
 		{
 			/* Set opacity for centered image */
 			my.Helper.setOpacity(my.imagesDiv.childNodes[imageID], my.opacityArray[0]);
-			my.imagesDiv.childNodes[imageID].pc = my.imagesDiv.childNodes[imageID].pc * my.imageFocusM;
+			my.imagesDiv.childNodes[imageID].pc = my.imagesDiv.childNodes[imageID].pcMem * my.imageFocusM;
 
 			/* Set opacity for the other images that are displayed */
 			var opacityValue = 0;
@@ -1299,6 +1399,61 @@ function ImageFlow ()
 					my.refresh();
 				};
 			}
+		},
+
+		/* Get IMG tags recursively from within some HTML structure and sets longDesc, if wrapped into a link. Extracts captions from HTML with class Imageflow_caption */
+		getImagesFromStructure: function(structure, level)
+		{
+			if (!level)
+			{
+				level = 0;
+			}
+			var imgNode = null;
+			var linkURL = null;
+			var caption = null;
+			var tempNode = null;
+			var childLength = structure.childNodes.length;
+			for (var child = 0; child < childLength; child++)
+			{
+				tempNode = structure.childNodes[child];
+				if (tempNode.hasChildNodes())
+				{
+					if (!imgNode)
+					{
+						/* recurse to get an IMG, if current tag is not IMG */
+						imgNode = this.getImagesFromStructure(tempNode, level++);
+						if (tempNode.nodeName == 'A' && tempNode.href && tempNode.href != '')
+						{
+							linkURL = tempNode.href;
+						}
+					}
+					/* fetch the HTML caption, if marked with the proper class */
+					if (tempNode.className == 'Imageflow_caption')
+					{
+						caption = tempNode.innerHTML;
+					}
+				}
+				else
+				{
+					if (tempNode)
+					{
+						if (tempNode.nodeName == 'IMG')
+						{
+							imgNode = tempNode;
+						}
+					}
+				}
+			}
+			/* collect caption and href and push it back to the imgNode */
+			if (caption && imgNode)
+			{
+				imgNode.setAttribute('alt', caption);
+			}
+			if (linkURL && imgNode)
+			{
+				imgNode.setAttribute('longdesc', linkURL);
+			}
+			return imgNode;
 		}
 	};
 }
