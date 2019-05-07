@@ -28,7 +28,7 @@
 	}
 	
 	//	GD check
-	if (extension_loaded('gd') == false && !dl('gd.so'))
+	if (extension_loaded('gd') == false)
 	{
 		echo 'You are missing the GD extension for PHP, sorry but I cannot continue.';
 		exit();
@@ -43,7 +43,7 @@
         exit();
     }
     
-    if (ereg_replace('[[:alpha:][:space:]()]+', '', $gd_info['GD Version']) < '2.0.1')
+    if (preg_replace('[[:alpha:][:space:]()]+', '', $gd_info['GD Version']) < '2.0.1')
     {
         echo 'GD library is too old. Version 2.0.1 or later is required, and 2.0.28 is strongly recommended.';
         exit();
