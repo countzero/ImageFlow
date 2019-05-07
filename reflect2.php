@@ -37,7 +37,7 @@
 	}
 	
 	//	GD check
-	if (extension_loaded('gd') == false && !dl('gd.so'))
+	if (extension_loaded('gd') == false)
 	{
 		echo 'You are missing the GD extension for PHP, sorry but I cannot continue.';
 		exit();
